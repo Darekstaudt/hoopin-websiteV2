@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0b1e2d">
+  <title>Join Group - Hoopin'</title>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/animations.css">
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <button class="btn btn-icon" onclick="navigateToPage('index.html')" aria-label="Go back">
+        ← Back
+      </button>
+      <div class="logo">🏀 Hoopin'</div>
+      <div style="width: 44px;"></div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="form-container page-transition">
+      <div class="form-card">
+        <h1 class="text-center">Join Group</h1>
+        <p class="text-center" style="color: var(--text-secondary); margin-bottom: 2rem;">
+          Enter the group ID and password to join
+        </p>
+
+        <form id="joinGroupForm" onsubmit="handleSubmit(event)">
+          <!-- Group ID -->
+          <div class="form-group required">
+            <label for="groupId">Group ID</label>
+            <input 
+              type="text" 
+              id="groupId" 
+              name="groupId" 
+              placeholder="e.g., group_1234567890_abc123"
+              required
+            >
+            <span class="help-text">Ask your group creator for the group ID</span>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group required">
+            <label for="password">Password</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="Enter group password"
+              required
+            >
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="navigateToPage('index.html')">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              Join Group
+            </button>
+          </div>
+        </form>
+
+        <!-- Help Section -->
+        <div class="card" style="margin-top: 2rem; background: rgba(0, 188, 212, 0.1); border: 1px solid var(--accent-primary);">
+          <h4>💡 Need Help?</h4>
+          <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-secondary);">
+            <li>The group ID looks like: <code>group_1234567890_abc123</code></li>
+            <li>Get it from your group creator</li>
+            <li>Make sure you have the correct password</li>
+          </ul>
+        </div>
+
+        <div class="text-center" style="margin-top: 2rem;">
+          <p style="color: var(--text-muted); font-size: 0.875rem;">
+            Don't have a group yet? <a href="group-create.html">Create one</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/performance.js"></script>
+  <script src="js/db-manager.js"></script>
+  <script src="js/groups.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    async function handleSubmit(event) {
+      event.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const form = document.getElementById('joinGroupForm');
+      
+      // Get form data
+      const formData = new FormData(form);
+      const groupId = formData.get('groupId').trim();
+      const password = formData.get('password');
+      
+      // Validate
+      if (!groupId || !password) {
+        showToast('Please fill in all fields', 'error');
+        return;
+      }
+      
+      // Disable button
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Joining...';
+      showLoading('Joining group...');
+      
+      try {
+        // Join group
+        const result = await groupManager.joinGroup(groupId, password);
+        
+        hideLoading();
+        
+        if (result.success) {
+          showToast(`Joined ${result.group.groupName}!`, 'success');
+          
+          // Navigate to dashboard after short delay
+          setTimeout(() => {
+            navigateToPage('dashboard.html');
+          }, 1000);
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        hideLoading();
+        console.error('Join group error:', error);
+        
+        let errorMessage = 'Failed to join group';
+        if (error.message.includes('not found')) {
+          errorMessage = 'Group not found. Please check the Group ID.';
+        } else if (error.message.includes('password')) {
+          errorMessage = 'Incorrect password. Please try again.';
+        }
+        
+        showToast(errorMessage, 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Join Group';
+      }
+    }
+
+    // Load group ID from URL if provided
+    window.addEventListener('load', () => {
+      const params = getQueryParams();
+      if (params.groupId) {
+        document.getElementById('groupId').value = params.groupId;
+      }
+      
+      // Focus on first empty field
+      const groupIdInput = document.getElementById('groupId');
+      const passwordInput = document.getElementById('password');
+      
+      if (!groupIdInput.value) {
+        groupIdInput.focus();
+      } else {
+        passwordInput.focus();
+      }
+    });
+  </script>
+</body>
+</html>

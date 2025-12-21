@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0b1e2d">
+  <title>Team Roster - Hoopin'</title>
+  
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/divisions.css">
+  <link rel="stylesheet" href="css/animations.css">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <button class="btn btn-icon" data-action="back">← Back</button>
+      <div class="logo">🏀 <span id="teamNameHeader"></span></div>
+      <button class="btn btn-icon" onclick="showTeamMenu()">⋮</button>
+    </div>
+  </header>
+
+  <div class="container page-transition">
+    <!-- Team Header -->
+    <div class="card" style="margin-top: 1rem;">
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <div id="teamPhotoContainer"></div>
+        <div style="flex: 1;">
+          <h2 style="margin: 0 0 0.5rem 0;" id="teamName"></h2>
+          <p style="margin: 0; color: var(--text-secondary);" id="teamManager"></p>
+          <div id="teamDivision" style="margin-top: 0.5rem;"></div>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 1rem;">
+        <div style="text-align: center; padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-md);">
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-primary);" id="totalPlayers">0</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Players</div>
+        </div>
+        <div style="text-align: center; padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-md);">
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-primary);" id="avgOverall">0</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Avg OVR</div>
+        </div>
+        <div style="text-align: center; padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-md);">
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-primary);" id="startersCount">0</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Starters</div>
+        </div>
+        <div style="text-align: center; padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-md);">
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-primary);" id="benchCount">0</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Bench</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Starters -->
+    <h3 style="margin: 2rem 0 1rem 0;">Starting 5</h3>
+    <div class="player-cards-scroll" id="startersContainer"></div>
+
+    <!-- Bench -->
+    <h3 style="margin: 2rem 0 1rem 0;">Bench</h3>
+    <div class="player-cards-scroll" id="benchContainer"></div>
+  </div>
+
+  <button class="fab" onclick="addPlayer()" aria-label="Add player">➕</button>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/performance.js"></script>
+  <script src="js/db-manager.js"></script>
+  <script src="js/ratings.js"></script>
+  <script src="js/groups.js"></script>
+  <script src="js/teams.js"></script>
+  <script src="js/players.js"></script>
+  <script src="js/divisions.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    let teamId = null;
+    let currentTeam = null;
+
+    async function loadTeamRoster() {
+      if (!teamId) return;
+
+      showLoading('Loading roster...');
+
+      try {
+        currentTeam = await teamManager.getTeam(teamId);
+        const { starters, bench } = await teamManager.getTeamRoster(teamId);
+        const stats = await teamManager.getTeamStats(teamId);
+        const division = await divisionManager.calculateTeamDivision(teamId);
+
+        hideLoading();
+
+        if (!currentTeam) {
+          showToast('Team not found', 'error');
+          return;
+        }
+
+        document.getElementById('teamNameHeader').textContent = currentTeam.teamName;
+        document.getElementById('teamName').textContent = currentTeam.teamName;
+        document.getElementById('teamManager').textContent = `Manager: ${currentTeam.manager}`;
+        
+        const photoContainer = document.getElementById('teamPhotoContainer');
+        if (currentTeam.teamPhoto) {
+          photoContainer.innerHTML = `<img src="${currentTeam.teamPhoto}" style="width: 80px; height: 80px; border-radius: var(--radius-lg); object-fit: cover;">`;
+        } else {
+          photoContainer.innerHTML = '<div style="width: 80px; height: 80px; background: var(--secondary-bg); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 3rem;">🏀</div>';
+        }
+
+        document.getElementById('teamDivision').innerHTML = divisionManager.createDivisionBadge(division.name, 'small');
+
+        document.getElementById('totalPlayers').textContent = stats.totalPlayers;
+        document.getElementById('avgOverall').textContent = stats.avgOverall;
+        document.getElementById('startersCount').textContent = `${stats.startersCount}/5`;
+        document.getElementById('benchCount').textContent = stats.benchCount;
+
+        renderPlayers('startersContainer', starters, 'No starters yet');
+        renderPlayers('benchContainer', bench, 'No bench players yet');
+      } catch (error) {
+        hideLoading();
+        console.error('Load roster error:', error);
+        showToast('Failed to load roster', 'error');
+      }
+    }
+
+    function renderPlayers(containerId, players, emptyMessage) {
+      const container = document.getElementById(containerId);
+      
+      if (players.length === 0) {
+        container.innerHTML = `<div style="padding: 2rem; text-align: center; color: var(--text-muted);">${emptyMessage}</div>`;
+        return;
+      }
+
+      container.innerHTML = '';
+      
+      players.forEach(player => {
+        const card = document.createElement('div');
+        card.className = `player-card ${player.tierClass} gpu-accelerated`;
+        card.onclick = () => viewPlayer(player.playerId);
+        
+        card.innerHTML = `
+          <div class="player-card-header">
+            ${player.playerPhoto 
+              ? `<img src="${player.playerPhoto}" class="player-photo" alt="${player.playerName}">`
+              : '<div class="player-photo" style="background: var(--secondary-bg); display: flex; align-items: center; justify-content: center; font-size: 2rem;">👤</div>'
+            }
+            <div class="player-info">
+              <div class="player-name">${sanitizeHTML(player.playerName)}</div>
+            </div>
+          </div>
+          
+          <div class="tier-badge tier-${player.tierClass.replace('tier-', '')}" style="background: ${player.gradient}">
+            <div class="tier-overall">${player.overall}</div>
+            <div class="tier-name">${player.tier}</div>
+            <div class="tier-rarity">${player.rarity}</div>
+          </div>
+          
+          <div class="player-stats">
+            <div class="stat-item">
+              <div class="stat-label">Base</div>
+              <div class="stat-value">${player.baseTotal}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Cap</div>
+              <div class="stat-value">${player.capBreakerTotal}</div>
+            </div>
+          </div>
+        `;
+        
+        container.appendChild(card);
+      });
+    }
+
+    function addPlayer() {
+      navigateToPage(`player-add.html?teamId=${teamId}`);
+    }
+
+    function viewPlayer(playerId) {
+      navigateToPage(`player-card.html?playerId=${playerId}`);
+    }
+
+    function showTeamMenu() {
+      const actions = [
+        { label: 'Edit Team', action: () => navigateToPage(`team-create.html?teamId=${teamId}`) },
+        { label: 'Share Team', action: shareTeam },
+        { label: 'Delete Team', action: deleteTeam }
+      ];
+      
+      const menu = actions.map(a => `<button class="btn btn-block" onclick="${a.action.name}()">${a.label}</button>`).join('');
+      
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); padding: 1rem; border-radius: var(--radius-lg) var(--radius-lg) 0 0; box-shadow: var(--shadow-xl); z-index: 1000;';
+      modal.innerHTML = menu + '<button class="btn btn-secondary btn-block" onclick="this.parentElement.remove()">Cancel</button>';
+      document.body.appendChild(modal);
+    }
+
+    async function shareTeam() {
+      if (!currentTeam) return;
+      await shareData({
+        title: `${currentTeam.teamName} - Hoopin'`,
+        text: `Check out my team: ${currentTeam.teamName}`,
+        url: window.location.href
+      });
+    }
+
+    async function deleteTeam() {
+      if (!currentTeam) return;
+      if (!confirm(`Delete ${currentTeam.teamName}? This cannot be undone.`)) return;
+      
+      showLoading('Deleting team...');
+      const result = await teamManager.deleteTeam(teamId);
+      hideLoading();
+      
+      if (result.success) {
+        showToast('Team deleted', 'success');
+        setTimeout(() => navigateToPage('dashboard.html'), 1000);
+      } else {
+        showToast('Failed to delete team', 'error');
+      }
+    }
+
+    window.addEventListener('load', () => {
+      setupCommonElements();
+      teamId = getQueryParams().teamId;
+      
+      if (!teamId) {
+        showToast('No team specified', 'error');
+        navigateToPage('dashboard.html');
+        return;
+      }
+      
+      loadTeamRoster();
+    });
+  </script>
+</body>
+</html>

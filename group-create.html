@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0b1e2d">
+  <title>Create Group - Hoopin'</title>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/animations.css">
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <button class="btn btn-icon" onclick="navigateToPage('index.html')" aria-label="Go back">
+        ← Back
+      </button>
+      <div class="logo">🏀 Hoopin'</div>
+      <div style="width: 44px;"></div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="form-container page-transition">
+      <div class="form-card">
+        <h1 class="text-center">Create New Group</h1>
+        <p class="text-center" style="color: var(--text-secondary); margin-bottom: 2rem;">
+          Start your basketball team management group
+        </p>
+
+        <form id="createGroupForm" onsubmit="handleSubmit(event)">
+          <!-- Group Name -->
+          <div class="form-group required">
+            <label for="groupName">Group Name</label>
+            <input 
+              type="text" 
+              id="groupName" 
+              name="groupName" 
+              placeholder="e.g., Lakers Squad"
+              required
+              maxlength="50"
+            >
+            <span class="help-text">Choose a memorable name for your group</span>
+          </div>
+
+          <!-- Creator Name -->
+          <div class="form-group required">
+            <label for="creator">Your Name</label>
+            <input 
+              type="text" 
+              id="creator" 
+              name="creator" 
+              placeholder="e.g., John Smith"
+              required
+              maxlength="50"
+            >
+          </div>
+
+          <!-- Password -->
+          <div class="form-group required">
+            <label for="password">Password</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="Create a password"
+              required
+              minlength="4"
+              maxlength="50"
+            >
+            <span class="help-text">Members will need this password to join</span>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group required">
+            <label for="confirmPassword">Confirm Password</label>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              name="confirmPassword" 
+              placeholder="Confirm password"
+              required
+            >
+          </div>
+
+          <!-- Description (Optional) -->
+          <div class="form-group">
+            <label for="description">Description (Optional)</label>
+            <textarea 
+              id="description" 
+              name="description" 
+              placeholder="Tell others about this group..."
+              maxlength="200"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="navigateToPage('index.html')">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              Create Group
+            </button>
+          </div>
+        </form>
+
+        <!-- Result Display -->
+        <div id="resultDisplay" class="d-none" style="margin-top: 2rem; text-align: center;">
+          <div class="card" style="background: rgba(76, 175, 80, 0.1); border: 2px solid var(--accent-success);">
+            <h3 style="color: var(--accent-success);">✓ Group Created!</h3>
+            <p>Share this information with your team members:</p>
+            
+            <div style="background: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: var(--radius-md); margin: 1rem 0;">
+              <p style="margin: 0.5rem 0;">
+                <strong>Group Name:</strong> <span id="resultGroupName"></span>
+              </p>
+              <p style="margin: 0.5rem 0;">
+                <strong>Group ID:</strong> 
+                <code id="resultGroupId" style="background: var(--secondary-bg); padding: 0.25rem 0.5rem; border-radius: var(--radius-sm);"></code>
+                <button class="btn btn-small" onclick="copyGroupId()" style="margin-left: 0.5rem;">Copy</button>
+              </p>
+            </div>
+
+            <button class="btn btn-primary" onclick="goToDashboard()">
+              Go to Dashboard →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/performance.js"></script>
+  <script src="js/db-manager.js"></script>
+  <script src="js/groups.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    let createdGroupId = null;
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const form = document.getElementById('createGroupForm');
+      
+      // Get form data
+      const formData = new FormData(form);
+      const password = formData.get('password');
+      const confirmPassword = formData.get('confirmPassword');
+      
+      // Validate passwords match
+      if (password !== confirmPassword) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
+      
+      // Disable button
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
+      showLoading('Creating group...');
+      
+      try {
+        // Create group
+        const result = await groupManager.createGroup({
+          groupName: formData.get('groupName'),
+          creator: formData.get('creator'),
+          password: password,
+          description: formData.get('description')
+        });
+        
+        hideLoading();
+        
+        if (result.success) {
+          createdGroupId = result.group.groupId;
+          
+          // Show success
+          document.getElementById('resultGroupName').textContent = result.group.groupName;
+          document.getElementById('resultGroupId').textContent = result.group.groupId;
+          document.getElementById('resultDisplay').classList.remove('d-none');
+          
+          // Hide form
+          form.style.display = 'none';
+          
+          showToast('Group created successfully!', 'success');
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        hideLoading();
+        console.error('Create group error:', error);
+        showToast(error.message || 'Failed to create group', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Group';
+      }
+    }
+
+    function copyGroupId() {
+      const groupId = document.getElementById('resultGroupId').textContent;
+      copyToClipboard(groupId);
+    }
+
+    function goToDashboard() {
+      navigateToPage('dashboard.html');
+    }
+
+    // Auto-save draft
+    const autosaveDraft = debounce(() => {
+      const form = document.getElementById('createGroupForm');
+      const formData = new FormData(form);
+      const draft = {
+        groupName: formData.get('groupName'),
+        creator: formData.get('creator'),
+        description: formData.get('description')
+      };
+      session.set('groupDraft', draft);
+    }, 1000);
+
+    // Load draft on page load
+    window.addEventListener('load', () => {
+      const draft = session.get('groupDraft');
+      if (draft) {
+        document.getElementById('groupName').value = draft.groupName || '';
+        document.getElementById('creator').value = draft.creator || '';
+        document.getElementById('description').value = draft.description || '';
+      }
+
+      // Setup autosave
+      const inputs = document.querySelectorAll('input, textarea');
+      inputs.forEach(input => {
+        input.addEventListener('input', autosaveDraft);
+      });
+    });
+
+    // Clear draft on successful creation
+    window.addEventListener('beforeunload', () => {
+      if (createdGroupId) {
+        session.remove('groupDraft');
+      }
+    });
+  </script>
+</body>
+</html>
