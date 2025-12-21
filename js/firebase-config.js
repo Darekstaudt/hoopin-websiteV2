@@ -10,15 +10,24 @@
  * 6. Enable Realtime Database in Firebase Console
  */
 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "PASTE_YOUR_FIREBASE_API_KEY_HERE",
-  authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
-  databaseURL: "PASTE_YOUR_DATABASE_URL_HERE",
-  projectId: "PASTE_YOUR_PROJECT_ID_HERE",
-  storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
-  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
-  appId: "PASTE_YOUR_APP_ID_HERE"
+  apiKey: "AIzaSyDX7gvsZSzq49BNh_udmHCduKvsOT-egsY",
+  authDomain: "hoopin-websitev2.firebaseapp.com",
+  databaseURL: "https://hoopin-websitev2-default-rtdb.firebaseio.com",
+  projectId: "hoopin-websitev2",
+  storageBucket: "hoopin-websitev2.firebasestorage.app",
+  messagingSenderId: "89332027026",
+  appId: "1:89332027026:web:2debdf61bb533dd1e9a04b"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase
 let firebaseInitialized = false;
