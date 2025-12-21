@@ -10,15 +10,10 @@
  * 6. Enable Realtime Database in Firebase Console
  */
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDX7gvsZSzq49BNh_udmHCduKvsOT-egsY",
-  authDomain: "hoopin-websitev2.firebaseapp.com",
+  authDomain:  "hoopin-websitev2.firebaseapp.com",
   databaseURL: "https://hoopin-websitev2-default-rtdb.firebaseio.com",
   projectId: "hoopin-websitev2",
   storageBucket: "hoopin-websitev2.firebasestorage.app",
@@ -26,45 +21,38 @@ const firebaseConfig = {
   appId: "1:89332027026:web:2debdf61bb533dd1e9a04b"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase (using compat version loaded in HTML)
+try {
+  firebase.initializeApp(firebaseConfig);
+  console.log('✅ Firebase initialized successfully');
+} catch (error) {
+  console.error('❌ Firebase initialization error:', error);
+}
 
-// Initialize Firebase
-let firebaseInitialized = false;
-let database = null;
+// Get database reference
+const database = firebase.database();
 
-function initializeFirebase() {
-  try {
-    if (!firebaseInitialized && typeof firebase !== 'undefined') {
-      // Check if config is still using placeholders
-      if (firebaseConfig.apiKey.includes('PASTE_YOUR')) {
-        console.warn('⚠️ Firebase not configured. Using local storage only.');
-        console.warn('📝 Please update firebase-config.js with your Firebase credentials.');
-        return false;
-      }
+// Enable offline persistence
+database.goOffline();
+database.goOnline();
 
-      firebase.initializeApp(firebaseConfig);
-      database = firebase.database();
-      firebaseInitialized = true;
-      console.log('✅ Firebase initialized successfully');
-      return true;
-    }
-    return firebaseInitialized;
-  } catch (error) {
-    console.error('❌ Firebase initialization error:', error);
-    return false;
+// Connection monitoring
+const connectedRef = database.ref('.info/connected');
+let isOnline = true;
+
+connectedRef.on('value', (snap) => {
+  isOnline = snap.val() === true;
+  if (isOnline) {
+    console.log('✅ Firebase connected');
+  } else {
+    console.log('⚠️ Offline mode');
   }
-}
+});
 
-// Get Firebase database reference
-function getDatabase() {
-  if (!firebaseInitialized) {
-    initializeFirebase();
-  }
-  return database;
-}
+// Expose globally so HTML pages can access
+window.db = database;
+window.firebase = firebase;
+window.isFirebaseAvailable = () => true;
+window.isOnline = () => isOnline;
 
-// Check if Firebase is available and configured
-function isFirebaseAvailable() {
-  return firebaseInitialized && database !== null;
-}
+console.log('🔥 Firebase config loaded');
