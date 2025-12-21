@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0b1e2d">
+  <meta name="description" content="Basketball team management with NBA 2K-style player ratings">
+  <title>Hoopin' - Basketball Team Management</title>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/animations.css">
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero section text-center page-transition">
+      <div class="logo" style="font-size: 3rem; margin-bottom: 2rem;">
+        🏀 Hoopin'
+      </div>
+      
+      <h1 style="margin-bottom: 1rem;">Basketball Team Management</h1>
+      <p style="font-size: 1.125rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 3rem;">
+        Create and manage your basketball teams with NBA 2K-style player ratings. 
+        Complete with offline support and permanent data persistence.
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="btn-group" style="max-width: 400px; margin: 0 auto; gap: 1rem; display: flex; flex-direction: column;">
+        <button class="btn btn-primary btn-large" onclick="navigateToPage('group-create.html')">
+          🎮 Create New Group
+        </button>
+        <button class="btn btn-secondary btn-large" onclick="navigateToPage('group-join.html')">
+          🔗 Join Existing Group
+        </button>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section">
+      <h2 class="text-center mb-4">Features</h2>
+      
+      <div class="grid grid-3 stagger-children">
+        <div class="card text-center">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
+          <h3>NBA 2K-Style Ratings</h3>
+          <p style="color: var(--text-secondary);">
+            Comprehensive player rating system with 11 tiers from Bronze to Dark Matter
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">💾</div>
+          <h3>Triple-Layer Storage</h3>
+          <p style="color: var(--text-secondary);">
+            Data never disappears with Firebase, IndexedDB, and localStorage
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📴</div>
+          <h3>Offline Support</h3>
+          <p style="color: var(--text-secondary);">
+            Works completely offline with automatic sync when back online
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">⚾</div>
+          <h3>Division System</h3>
+          <p style="color: var(--text-secondary);">
+            Baseball-style divisions (D1, D2, D3, NAIA) based on roster completion
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
+          <h3>Mobile-First</h3>
+          <p style="color: var(--text-secondary);">
+            Optimized for touch devices with smooth GPU-accelerated animations
+          </p>
+        </div>
+
+        <div class="card text-center">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🎨</div>
+          <h3>Beautiful UI</h3>
+          <p style="color: var(--text-secondary);">
+            Stunning NBA 2K-inspired player cards with tier-based gradients
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tier System Preview -->
+    <section class="section">
+      <h2 class="text-center mb-4">Player Tier System</h2>
+      <p class="text-center mb-4" style="color: var(--text-secondary);">
+        Players are rated from 0-108 and automatically categorized into tiers
+      </p>
+      
+      <div class="grid grid-2" id="tierPreview"></div>
+    </section>
+
+    <!-- Getting Started -->
+    <section class="section text-center">
+      <h2 class="mb-4">Ready to Get Started?</h2>
+      <div style="max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+        <button class="btn btn-primary btn-large" onclick="navigateToPage('group-create.html')">
+          Create Your Group
+        </button>
+        <p style="font-size: 0.875rem; color: var(--text-muted);">
+          Already have a group ID? <a href="group-join.html">Join here</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="section text-center" style="color: var(--text-muted); font-size: 0.875rem;">
+      <p>Made with 🏀 for basketball team management</p>
+      <p>Version 1.0.0 | <a href="https://github.com" target="_blank">GitHub</a></p>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/performance.js"></script>
+  <script src="js/db-manager.js"></script>
+  <script src="js/ratings.js"></script>
+  <script src="js/groups.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    // Render tier preview
+    function renderTierPreview() {
+      const tiers = ratingsCalculator.getAllTiers();
+      const container = document.getElementById('tierPreview');
+      
+      tiers.forEach((tier, index) => {
+        const card = document.createElement('div');
+        card.className = 'card fade-in-up';
+        card.style.animationDelay = `${index * 0.05}s`;
+        card.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="tier-badge tier-${tier.class.replace('tier-', '')}" 
+                 style="background: ${tier.gradient}; position: static;">
+              <div class="tier-overall">${tier.min}</div>
+            </div>
+            <div style="flex: 1;">
+              <h4 style="margin: 0 0 0.25rem 0;">${tier.name}</h4>
+              <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                ${tier.min}-${tier.max} • ${tier.rarity}
+              </p>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Check if already in a group
+    window.addEventListener('load', () => {
+      if (groupManager.isInGroup()) {
+        // Already in a group, offer to continue
+        const group = groupManager.getCurrentGroup();
+        if (confirm(`Continue with group "${group.groupName}"?`)) {
+          navigateToPage('dashboard.html');
+        } else {
+          groupManager.clearCurrentGroup();
+        }
+      }
+      
+      renderTierPreview();
+    });
+  </script>
+</body>
+</html>

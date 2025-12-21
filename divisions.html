@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0b1e2d">
+  <title>Divisions - Hoopin'</title>
+  
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/divisions.css">
+  <link rel="stylesheet" href="css/animations.css">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <button class="btn btn-icon" data-action="back">← Back</button>
+      <div class="logo">🏀 Divisions</div>
+      <button class="btn btn-icon" data-action="home">🏠</button>
+    </div>
+  </header>
+
+  <div class="container page-transition">
+    <div class="card" style="margin-top: 1rem;">
+      <h1>Division Standings</h1>
+      <p style="color: var(--text-secondary);">Teams automatically categorized by roster completion</p>
+    </div>
+
+    <div class="division-filters" id="divisionFilters"></div>
+    
+    <div id="divisionsContainer"></div>
+  </div>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/performance.js"></script>
+  <script src="js/db-manager.js"></script>
+  <script src="js/ratings.js"></script>
+  <script src="js/groups.js"></script>
+  <script src="js/teams.js"></script>
+  <script src="js/players.js"></script>
+  <script src="js/divisions.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    let currentGroup = null;
+    let selectedDivision = 'all';
+
+    async function loadDivisions() {
+      currentGroup = groupManager.getCurrentGroup();
+      if (!currentGroup) return;
+
+      showLoading('Loading divisions...');
+
+      try {
+        const standings = await divisionManager.getDivisionStandings(currentGroup.groupId);
+        hideLoading();
+
+        renderFilters();
+        renderStandings(standings);
+      } catch (error) {
+        hideLoading();
+        console.error('Load divisions error:', error);
+        showToast('Failed to load divisions', 'error');
+      }
+    }
+
+    function renderFilters() {
+      const container = document.getElementById('divisionFilters');
+      const divisions = divisionManager.getAllDivisions();
+
+      container.innerHTML = `
+        <div class="division-filter-btn ${selectedDivision === 'all' ? 'active' : ''}" onclick="selectDivision('all')">
+          All
+        </div>
+      `;
+
+      for (const [key, division] of Object.entries(divisions)) {
+        container.innerHTML += `
+          <div class="division-filter-btn division-${key.toLowerCase()} ${selectedDivision === key ? 'active' : ''}" onclick="selectDivision('${key}')">
+            ${division.icon} ${division.name}
+          </div>
+        `;
+      }
+    }
+
+    function selectDivision(division) {
+      selectedDivision = division;
+      loadDivisions();
+    }
+
+    function renderStandings(standings) {
+      const container = document.getElementById('divisionsContainer');
+      container.innerHTML = '';
+
+      const filteredStandings = selectedDivision === 'all' 
+        ? standings 
+        : standings.filter(s => s.division.name === selectedDivision);
+
+      filteredStandings.forEach(({ division, teams }) => {
+        if (selectedDivision === 'all' && teams.length === 0) return;
+
+        const card = document.createElement('div');
+        card.className = `division-card division-${division.name.toLowerCase()} fade-in-up`;
+
+        card.innerHTML = `
+          <div class="division-header">
+            <div class="division-title">
+              <div style="font-size: 2rem;">${division.icon}</div>
+              <div>
+                <h3>${division.fullName}</h3>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                  ${division.description}
+                </p>
+              </div>
+            </div>
+            <div class="division-stats">
+              <div class="division-stat">
+                <div class="division-stat-value">${teams.length}</div>
+                <div class="division-stat-label">Teams</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="division-teams" id="division-${division.name}"></div>
+        `;
+
+        container.appendChild(card);
+
+        renderDivisionTeams(`division-${division.name}`, teams);
+      });
+    }
+
+    function renderDivisionTeams(containerId, teams) {
+      const container = document.getElementById(containerId);
+
+      if (teams.length === 0) {
+        container.innerHTML = '<div class="division-empty"><div class="division-empty-icon">📋</div><p>No teams in this division yet</p></div>';
+        return;
+      }
+
+      teams.forEach((team, index) => {
+        const item = document.createElement('div');
+        item.className = 'division-team-item';
+        item.onclick = () => navigateToPage(`roster-view.html?teamId=${team.teamId}`);
+
+        item.innerHTML = `
+          <div class="team-rank">#${index + 1}</div>
+          ${team.teamPhoto 
+            ? `<img src="${team.teamPhoto}" class="team-photo-small" alt="${team.teamName}">`
+            : '<div class="team-photo-small" style="display: flex; align-items: center; justify-content: center;">🏀</div>'
+          }
+          <div class="team-info-compact">
+            <div class="team-name-compact">${sanitizeHTML(team.teamName)}</div>
+            <div class="team-manager-compact">${sanitizeHTML(team.manager)}</div>
+          </div>
+          <div class="team-rating">
+            <div class="team-overall">${team.stats.avgOverall}</div>
+            <div class="team-player-count">${team.stats.totalPlayers} players</div>
+          </div>
+        `;
+
+        container.appendChild(item);
+      });
+    }
+
+    window.addEventListener('load', () => {
+      setupCommonElements();
+      
+      if (!checkGroupAccess()) return;
+
+      const params = getQueryParams();
+      if (params.division) {
+        selectedDivision = params.division;
+      }
+
+      loadDivisions();
+    });
+  </script>
+</body>
+</html>

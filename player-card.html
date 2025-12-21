@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0b1e2d">
+  <title>Player Card - Hoopin'</title>
+  
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/animations.css">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <button class="btn btn-icon" data-action="back">← Back</button>
+      <div class="logo">🏀 Player Card</div>
+      <button class="btn btn-icon" onclick="showPlayerMenu()">⋮</button>
+    </div>
+  </header>
+
+  <div class="container page-transition">
+    <div class="player-card-detailed" id="playerCard"></div>
+  </div>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/performance.js"></script>
+  <script src="js/db-manager.js"></script>
+  <script src="js/ratings.js"></script>
+  <script src="js/groups.js"></script>
+  <script src="js/teams.js"></script>
+  <script src="js/players.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    let playerId = null;
+    let currentPlayer = null;
+
+    async function loadPlayerCard() {
+      if (!playerId) return;
+
+      showLoading('Loading player...');
+
+      try {
+        currentPlayer = await playerManager.getPlayerStats(playerId);
+        hideLoading();
+
+        if (!currentPlayer) {
+          showToast('Player not found', 'error');
+          return;
+        }
+
+        renderPlayerCard();
+      } catch (error) {
+        hideLoading();
+        console.error('Load player error:', error);
+        showToast('Failed to load player', 'error');
+      }
+    }
+
+    function renderPlayerCard() {
+      const container = document.getElementById('playerCard');
+      const player = currentPlayer;
+
+      const card = document.createElement('div');
+      card.className = `player-card ${player.tierClass}`;
+
+      card.innerHTML = `
+        ${player.playerPhoto 
+          ? `<img src="${player.playerPhoto}" class="player-photo" alt="${player.playerName}">`
+          : '<div class="player-photo" style="margin: 0 auto; background: var(--secondary-bg); display: flex; align-items: center; justify-content: center; font-size: 4rem;">👤</div>'
+        }
+
+        <h2 class="text-center" style="margin-top: 1rem;">${sanitizeHTML(player.playerName)}</h2>
+
+        <div class="tier-badge tier-${player.tierClass.replace('tier-', '')}" style="background: ${player.gradient}">
+          <div class="tier-overall">${player.overall}</div>
+          <div class="tier-name">${player.tier}</div>
+          <div class="tier-rarity">${player.rarity}</div>
+        </div>
+
+        <div class="player-stats" style="grid-template-columns: repeat(3, 1fr); margin: 2rem 0;">
+          <div class="stat-item">
+            <div class="stat-label">Base Stats</div>
+            <div class="stat-value">${player.baseTotal}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Cap Breakers</div>
+            <div class="stat-value">${player.capBreakerTotal}</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Tier Progress</div>
+            <div class="stat-value">${player.tierProgress}%</div>
+          </div>
+        </div>
+
+        ${player.nextTier ? `
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1rem; text-align: center;">
+            📈 ${player.nextTier.pointsNeeded} points to reach ${player.nextTier.tier.name}
+          </div>
+        ` : ''}
+
+        ${ratingsCalculator.createStatBars(player.stats, player.capBreakers)}
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 2rem;">
+          <button class="btn btn-primary" style="flex: 1;" onclick="editPlayer()">
+            ✏️ Edit
+          </button>
+          <button class="btn btn-secondary" onclick="sharePlayer()">
+            📤 Share
+          </button>
+          <button class="btn btn-danger" onclick="deletePlayer()">
+            🗑️ Delete
+          </button>
+        </div>
+      `;
+
+      container.innerHTML = '';
+      container.appendChild(card);
+    }
+
+    function editPlayer() {
+      if (!currentPlayer) return;
+      navigateToPage(`player-add.html?teamId=${currentPlayer.teamId}&playerId=${currentPlayer.playerId}`);
+    }
+
+    async function sharePlayer() {
+      if (!currentPlayer) return;
+      await shareData({
+        title: `${currentPlayer.playerName} - ${currentPlayer.tier} (${currentPlayer.overall} OVR)`,
+        text: `Check out this player on Hoopin'!`,
+        url: window.location.href
+      });
+    }
+
+    async function deletePlayer() {
+      if (!currentPlayer) return;
+      if (!confirm(`Delete ${currentPlayer.playerName}? This cannot be undone.`)) return;
+
+      showLoading('Deleting player...');
+      const result = await playerManager.deletePlayer(currentPlayer.playerId);
+      hideLoading();
+
+      if (result.success) {
+        showToast('Player deleted', 'success');
+        setTimeout(() => {
+          navigateToPage(`roster-view.html?teamId=${currentPlayer.teamId}`);
+        }, 1000);
+      } else {
+        showToast('Failed to delete player', 'error');
+      }
+    }
+
+    function showPlayerMenu() {
+      const actions = [
+        { label: 'Edit Player', action: editPlayer },
+        { label: 'Share Player', action: sharePlayer },
+        { label: 'Duplicate Player', action: duplicatePlayer },
+        { label: 'Delete Player', action: deletePlayer }
+      ];
+
+      const menu = actions.map(a => `<button class="btn btn-block" onclick="${a.action.name}()">${a.label}</button>`).join('');
+
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); padding: 1rem; border-radius: var(--radius-lg) var(--radius-lg) 0 0; box-shadow: var(--shadow-xl); z-index: 1000;';
+      modal.innerHTML = menu + '<button class="btn btn-secondary btn-block" onclick="this.parentElement.remove()">Cancel</button>';
+      document.body.appendChild(modal);
+    }
+
+    async function duplicatePlayer() {
+      if (!currentPlayer) return;
+      if (!confirm(`Duplicate ${currentPlayer.playerName}?`)) return;
+
+      showLoading('Duplicating player...');
+      const result = await playerManager.duplicatePlayer(currentPlayer.playerId);
+      hideLoading();
+
+      if (result.success) {
+        showToast('Player duplicated!', 'success');
+        setTimeout(() => loadPlayerCard(), 1000);
+      } else {
+        showToast('Failed to duplicate player', 'error');
+      }
+    }
+
+    window.addEventListener('load', () => {
+      setupCommonElements();
+      playerId = getQueryParams().playerId;
+
+      if (!playerId) {
+        showToast('No player specified', 'error');
+        navigateToPage('dashboard.html');
+        return;
+      }
+
+      loadPlayerCard();
+    });
+  </script>
+</body>
+</html>

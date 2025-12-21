@@ -1,0 +1,490 @@
+/**
+ * NBA 2K-Style Player Card Designs
+ * Tier-based player cards with gradients and animations
+ */
+
+/* ===== Player Card Base ===== */
+.player-card {
+  position: relative;
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-base);
+  overflow: hidden;
+  min-width: 280px;
+  cursor: pointer;
+}
+
+.player-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-primary);
+  transition: height var(--transition-base);
+}
+
+.player-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-xl);
+}
+
+.player-card:hover::before {
+  height: 8px;
+}
+
+/* ===== Tier-Specific Cards ===== */
+.player-card.tier-dark-matter {
+  background: linear-gradient(135deg, #1a0033 0%, #2a0052 100%);
+  border: 2px solid #ff00ff;
+  box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+}
+
+.player-card.tier-galaxy-opal {
+  background: linear-gradient(135deg, #2d1b4e 0%, #3a2564 100%);
+  border: 2px solid #f093fb;
+  box-shadow: 0 0 25px rgba(240, 147, 251, 0.4);
+}
+
+.player-card.tier-pink-diamond {
+  background: linear-gradient(135deg, #4a1942 0%, #5c2352 100%);
+  border: 2px solid #ff69b4;
+  box-shadow: 0 0 25px rgba(255, 105, 180, 0.4);
+}
+
+.player-card.tier-diamond {
+  background: linear-gradient(135deg, #0a2540 0%, #143a5c 100%);
+  border: 2px solid #00bfff;
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
+}
+
+.player-card.tier-amethyst {
+  background: linear-gradient(135deg, #2a1f40 0%, #3d2e5c 100%);
+  border: 2px solid #b19cd9;
+}
+
+.player-card.tier-ruby {
+  background: linear-gradient(135deg, #3d1226 0%, #4f1a34 100%);
+  border: 2px solid #ff6b9d;
+}
+
+.player-card.tier-sapphire {
+  background: linear-gradient(135deg, #0f1f3d 0%, #1a2d52 100%);
+  border: 2px solid #4169e1;
+}
+
+.player-card.tier-emerald {
+  background: linear-gradient(135deg, #0d2e1f 0%, #163d2a 100%);
+  border: 2px solid #50c878;
+}
+
+.player-card.tier-gold {
+  background: linear-gradient(135deg, #3d2f0d 0%, #4f3d14 100%);
+  border: 2px solid #ffd700;
+}
+
+.player-card.tier-silver {
+  background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+  border: 2px solid #c0c0c0;
+}
+
+.player-card.tier-bronze {
+  background: linear-gradient(135deg, #2d1f0d 0%, #3d2914 100%);
+  border: 2px solid #cd7f32;
+}
+
+/* ===== Card Header ===== */
+.player-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.player-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  background: var(--secondary-bg);
+}
+
+.player-info {
+  flex: 1;
+}
+
+.player-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-primary);
+}
+
+.player-team {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* ===== Tier Badge ===== */
+.tier-badge {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  animation: tierPulse 2s ease-in-out infinite;
+}
+
+.tier-badge.tier-small {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.75rem;
+}
+
+.tier-badge.tier-large {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 1.25rem;
+}
+
+.tier-overall {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: var(--spacing-xs);
+}
+
+.tier-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tier-rarity {
+  font-size: 0.625rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+/* Tier-specific badge colors */
+.tier-badge.tier-dark-matter {
+  background: var(--tier-dark-matter);
+}
+
+.tier-badge.tier-galaxy-opal {
+  background: var(--tier-galaxy-opal);
+}
+
+.tier-badge.tier-pink-diamond {
+  background: var(--tier-pink-diamond);
+}
+
+.tier-badge.tier-diamond {
+  background: var(--tier-diamond);
+}
+
+.tier-badge.tier-amethyst {
+  background: var(--tier-amethyst);
+}
+
+.tier-badge.tier-ruby {
+  background: var(--tier-ruby);
+}
+
+.tier-badge.tier-sapphire {
+  background: var(--tier-sapphire);
+}
+
+.tier-badge.tier-emerald {
+  background: var(--tier-emerald);
+}
+
+.tier-badge.tier-gold {
+  background: var(--tier-gold);
+}
+
+.tier-badge.tier-silver {
+  background: var(--tier-silver);
+}
+
+.tier-badge.tier-bronze {
+  background: var(--tier-bronze);
+}
+
+/* ===== Card Stats ===== */
+.player-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.stat-item {
+  background: rgba(0, 0, 0, 0.3);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+/* ===== Stat Bars ===== */
+.stat-bars {
+  margin-top: var(--spacing-md);
+}
+
+.stat-section {
+  margin-bottom: var(--spacing-md);
+}
+
+.stat-section h4 {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: var(--spacing-sm);
+}
+
+.stat-bar {
+  margin-bottom: var(--spacing-sm);
+}
+
+.stat-bar label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.bar-container {
+  position: relative;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  border-radius: var(--radius-sm);
+  transition: width var(--transition-base);
+}
+
+.bar-fill.cap-breaker {
+  background: linear-gradient(90deg, #ffd700 0%, #ff6b00 100%);
+}
+
+.bar-value {
+  position: absolute;
+  right: var(--spacing-xs);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Card Actions ===== */
+.player-card-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.card-action-btn {
+  flex: 1;
+  padding: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.card-action-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ===== Compact Card View ===== */
+.player-card.compact {
+  padding: var(--spacing-md);
+  min-width: 200px;
+}
+
+.player-card.compact .player-photo {
+  width: 50px;
+  height: 50px;
+}
+
+.player-card.compact .player-name {
+  font-size: 1rem;
+}
+
+.player-card.compact .tier-badge {
+  position: static;
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.player-card.compact .tier-overall {
+  font-size: 1.5rem;
+}
+
+/* ===== Card Grid Layout ===== */
+.player-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+/* ===== Horizontal Scrolling Cards ===== */
+.player-cards-scroll {
+  display: flex;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--spacing-md);
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.player-cards-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.player-cards-scroll .player-card {
+  scroll-snap-align: center;
+  flex: 0 0 auto;
+}
+
+/* ===== Card Loading State ===== */
+.player-card.loading {
+  pointer-events: none;
+}
+
+.player-card.loading .player-photo,
+.player-card.loading .player-name,
+.player-card.loading .tier-badge {
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.05) 0%, 
+    rgba(255, 255, 255, 0.1) 50%, 
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ===== Card Hover Effects ===== */
+@media (hover: hover) {
+  .player-card:hover .tier-badge {
+    animation: tierPulse 1s ease-in-out infinite;
+  }
+}
+
+@keyframes tierPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: var(--shadow-md);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+/* ===== Detailed Card View ===== */
+.player-card-detailed {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+}
+
+.player-card-detailed .player-photo {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto var(--spacing-md);
+  display: block;
+}
+
+.player-card-detailed .tier-badge {
+  position: static;
+  display: block;
+  margin: 0 auto var(--spacing-lg);
+  width: fit-content;
+}
+
+.player-card-detailed .player-stats {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* ===== Card Skeleton ===== */
+.skeleton-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  min-width: 280px;
+}
+
+.skeleton-image {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: var(--spacing-md);
+}
+
+.skeleton-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.skeleton-title,
+.skeleton-text {
+  height: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-title {
+  width: 60%;
+  height: 20px;
+}
+
+.skeleton-text.short {
+  width: 40%;
+}

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0b1e2d">
+  <title>Dashboard - Hoopin'</title>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/divisions.css">
+  <link rel="stylesheet" href="css/animations.css">
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">🏀 <span data-display="group-name"></span></div>
+      <button class="btn btn-secondary btn-small" data-action="logout">
+        Leave Group
+      </button>
+    </div>
+  </header>
+
+  <div class="container page-transition">
+    <!-- Group Info -->
+    <div class="card" style="margin-top: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="margin: 0 0 0.5rem 0;" id="groupNameDisplay"></h2>
+          <p style="margin: 0; color: var(--text-secondary);" id="groupInfoDisplay"></p>
+        </div>
+        <button class="btn btn-small btn-secondary" onclick="shareGroup()">
+          📤 Share
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" style="margin-top: 2rem;">
+      <div class="tab active" data-tab="all-teams">All Teams</div>
+      <div class="tab" data-tab="divisions">Divisions</div>
+      <div class="tab" data-tab="my-teams">My Teams</div>
+    </div>
+
+    <!-- Tab Content: All Teams -->
+    <div class="tab-content active" data-content="all-teams">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0;">
+        <h3>All Teams</h3>
+        <div style="color: var(--text-secondary);" id="allTeamsCount">0 teams</div>
+      </div>
+      
+      <div id="allTeamsContainer"></div>
+    </div>
+
+    <!-- Tab Content: Divisions -->
+    <div class="tab-content" data-content="divisions">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0;">
+        <h3>Divisions</h3>
+        <button class="btn btn-small btn-secondary" onclick="navigateToPage('divisions.html')">
+          View All
+        </button>
+      </div>
+      
+      <div class="division-summary" id="divisionSummary"></div>
+      <div id="divisionsContainer"></div>
+    </div>
+
+    <!-- Tab Content: My Teams -->
+    <div class="tab-content" data-content="my-teams">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0;">
+        <h3>My Teams</h3>
+        <div style="color: var(--text-secondary);" id="myTeamsCount">0 teams</div>
+      </div>
+      
+      <div id="myTeamsContainer"></div>
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <button class="fab" onclick="createNewTeam()" aria-label="Create new team">
+    ➕
+  </button>
+
+  <!-- Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/performance.js"></script>
+  <script src="js/image-optimizer.js"></script>
+  <script src="js/db-manager.js"></script>
+  <script src="js/ratings.js"></script>
+  <script src="js/groups.js"></script>
+  <script src="js/teams.js"></script>
+  <script src="js/players.js"></script>
+  <script src="js/divisions.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    let currentGroup = null;
+
+    // Check group access
+    if (!checkGroupAccess()) {
+      // Will redirect
+    }
+
+    // Setup tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        switchTab(tabName);
+      });
+    });
+
+    function switchTab(tabName) {
+      // Update active tab
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      
+      // Update active content
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector(`[data-content="${tabName}"]`).classList.add('active');
+      
+      // Load data for tab
+      if (tabName === 'all-teams') {
+        loadAllTeams();
+      } else if (tabName === 'divisions') {
+        loadDivisions();
+      } else if (tabName === 'my-teams') {
+        loadMyTeams();
+      }
+    }
+
+    // Load group info
+    async function loadGroupInfo() {
+      currentGroup = groupManager.getCurrentGroup();
+      if (!currentGroup) return;
+      
+      document.getElementById('groupNameDisplay').textContent = currentGroup.groupName;
+      document.getElementById('groupInfoDisplay').textContent = 
+        `Created ${formatDate(currentGroup.createdAt)} • ${currentGroup.members.length} members`;
+    }
+
+    // Load all teams
+    async function loadAllTeams() {
+      if (!currentGroup) return;
+      
+      showLoading('Loading teams...');
+      const container = document.getElementById('allTeamsContainer');
+      
+      try {
+        const teams = await teamManager.getTeamsByGroup(currentGroup.groupId);
+        
+        hideLoading();
+        
+        document.getElementById('allTeamsCount').textContent = 
+          `${teams.length} ${teams.length === 1 ? 'team' : 'teams'}`;
+        
+        if (teams.length === 0) {
+          container.innerHTML = createEmptyState(
+            '🏀',
+            'No Teams Yet',
+            'Create your first team to get started',
+            { text: 'Create Team', action: 'createNewTeam()' }
+          );
+          return;
+        }
+        
+        container.innerHTML = '';
+        container.className = 'grid grid-2';
+        
+        for (const team of teams) {
+          const stats = await teamManager.getTeamStats(team.teamId);
+          const division = await divisionManager.calculateTeamDivision(team.teamId);
+          
+          const card = document.createElement('div');
+          card.className = 'card hover-scale';
+          card.style.cursor = 'pointer';
+          card.onclick = () => viewTeam(team.teamId);
+          
+          card.innerHTML = `
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+              ${team.teamPhoto 
+                ? `<img src="${team.teamPhoto}" alt="${team.teamName}" style="width: 60px; height: 60px; border-radius: var(--radius-md); object-fit: cover;">`
+                : '<div style="width: 60px; height: 60px; background: var(--secondary-bg); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 2rem;">🏀</div>'
+              }
+              <div style="flex: 1;">
+                <h4 style="margin: 0 0 0.25rem 0;">${sanitizeHTML(team.teamName)}</h4>
+                <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                  ${sanitizeHTML(team.manager)}
+                </p>
+              </div>
+              ${divisionManager.createDivisionBadge(division.name, 'small')}
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; font-size: 0.875rem;">
+              <div style="text-align: center; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-sm);">
+                <div style="font-weight: 700; color: var(--accent-primary);">${stats.totalPlayers}</div>
+                <div style="color: var(--text-muted); font-size: 0.75rem;">Players</div>
+              </div>
+              <div style="text-align: center; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-sm);">
+                <div style="font-weight: 700; color: var(--accent-primary);">${stats.avgOverall}</div>
+                <div style="color: var(--text-muted); font-size: 0.75rem;">Avg OVR</div>
+              </div>
+              <div style="text-align: center; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-sm);">
+                <div style="font-weight: 700; color: var(--accent-primary);">${stats.startersCount}/5</div>
+                <div style="color: var(--text-muted); font-size: 0.75rem;">Starters</div>
+              </div>
+            </div>
+          `;
+          
+          container.appendChild(card);
+        }
+      } catch (error) {
+        hideLoading();
+        console.error('Load teams error:', error);
+        container.innerHTML = createEmptyState('❌', 'Error', 'Failed to load teams');
+      }
+    }
+
+    // Load divisions
+    async function loadDivisions() {
+      if (!currentGroup) return;
+      
+      showLoading('Loading divisions...');
+      
+      try {
+        const summary = await divisionManager.getDivisionSummary(currentGroup.groupId);
+        const divisionTeams = await divisionManager.getTeamsByDivision(currentGroup.groupId);
+        
+        hideLoading();
+        
+        // Render summary
+        const summaryContainer = document.getElementById('divisionSummary');
+        summaryContainer.innerHTML = '';
+        
+        const divisions = divisionManager.getAllDivisions();
+        for (const [key, division] of Object.entries(divisions)) {
+          const count = summary.byDivision[key] || 0;
+          const card = document.createElement('div');
+          card.className = `division-summary-card division-${key.toLowerCase()}`;
+          card.onclick = () => navigateToPage(`divisions.html?division=${key}`);
+          
+          card.innerHTML = `
+            <div class="division-summary-icon">${division.icon}</div>
+            <div class="division-summary-count">${count}</div>
+            <div class="division-summary-label">${division.name}</div>
+          `;
+          
+          summaryContainer.appendChild(card);
+        }
+        
+        // Render top division teams
+        const container = document.getElementById('divisionsContainer');
+        container.innerHTML = '';
+        
+        const topDivision = divisionTeams.D1.length > 0 ? 'D1' : 
+                           divisionTeams.D2.length > 0 ? 'D2' :
+                           divisionTeams.D3.length > 0 ? 'D3' : 'NAIA';
+        
+        if (divisionTeams[topDivision].length > 0) {
+          const div = divisions[topDivision];
+          const teams = divisionTeams[topDivision].slice(0, 5);
+          
+          container.innerHTML = `
+            <h4 style="margin-top: 2rem;">${div.fullName} Teams</h4>
+          `;
+          
+          teams.forEach(team => {
+            const item = document.createElement('div');
+            item.className = 'division-team-item';
+            item.onclick = () => viewTeam(team.teamId);
+            
+            item.innerHTML = `
+              ${team.teamPhoto 
+                ? `<img src="${team.teamPhoto}" class="team-photo-small" alt="${team.teamName}">`
+                : '<div class="team-photo-small" style="display: flex; align-items: center; justify-content: center;">🏀</div>'
+              }
+              <div class="team-info-compact">
+                <div class="team-name-compact">${sanitizeHTML(team.teamName)}</div>
+                <div class="team-manager-compact">${sanitizeHTML(team.manager)}</div>
+              </div>
+              <div class="team-rating">
+                <div class="team-overall">${team.stats.avgOverall}</div>
+                <div class="team-player-count">${team.stats.totalPlayers} players</div>
+              </div>
+            `;
+            
+            container.appendChild(item);
+          });
+        }
+      } catch (error) {
+        hideLoading();
+        console.error('Load divisions error:', error);
+      }
+    }
+
+    // Load my teams
+    async function loadMyTeams() {
+      if (!currentGroup) return;
+      
+      showLoading('Loading your teams...');
+      const container = document.getElementById('myTeamsContainer');
+      
+      try {
+        const allTeams = await teamManager.getTeamsByGroup(currentGroup.groupId);
+        const myTeams = allTeams.filter(team => 
+          team.manager === currentGroup.creator || 
+          currentGroup.members.includes(team.manager)
+        );
+        
+        hideLoading();
+        
+        document.getElementById('myTeamsCount').textContent = 
+          `${myTeams.length} ${myTeams.length === 1 ? 'team' : 'teams'}`;
+        
+        if (myTeams.length === 0) {
+          container.innerHTML = createEmptyState(
+            '🏀',
+            'No Teams Yet',
+            'Create your first team',
+            { text: 'Create Team', action: 'createNewTeam()' }
+          );
+          return;
+        }
+        
+        container.innerHTML = '';
+        container.className = 'grid grid-2';
+        
+        for (const team of myTeams) {
+          const stats = await teamManager.getTeamStats(team.teamId);
+          const divInfo = await divisionManager.getTeamDivisionInfo(team.teamId);
+          
+          const card = document.createElement('div');
+          card.className = 'card hover-scale';
+          
+          card.innerHTML = `
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+              ${team.teamPhoto 
+                ? `<img src="${team.teamPhoto}" alt="${team.teamName}" style="width: 60px; height: 60px; border-radius: var(--radius-md); object-fit: cover;">`
+                : '<div style="width: 60px; height: 60px; background: var(--secondary-bg); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 2rem;">🏀</div>'
+              }
+              <div style="flex: 1;">
+                <h4 style="margin: 0 0 0.25rem 0;">${sanitizeHTML(team.teamName)}</h4>
+                ${divisionManager.createDivisionBadge(divInfo.division.name, 'small')}
+              </div>
+            </div>
+            
+            ${divInfo.nextDivision ? `
+              <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: var(--radius-md); margin-bottom: 1rem; font-size: 0.875rem;">
+                📈 Add ${divInfo.playersNeeded} more ${divInfo.playersNeeded === 1 ? 'player' : 'players'} to reach ${divInfo.nextDivision.name}
+              </div>
+            ` : ''}
+            
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-primary btn-small" style="flex: 1;" onclick="viewTeam('${team.teamId}')">
+                View Roster
+              </button>
+              <button class="btn btn-secondary btn-small" onclick="addPlayer('${team.teamId}')">
+                ➕ Player
+              </button>
+            </div>
+          `;
+          
+          container.appendChild(card);
+        }
+      } catch (error) {
+        hideLoading();
+        console.error('Load my teams error:', error);
+        container.innerHTML = createEmptyState('❌', 'Error', 'Failed to load teams');
+      }
+    }
+
+    // Actions
+    function createNewTeam() {
+      navigateToPage('team-create.html');
+    }
+
+    function viewTeam(teamId) {
+      navigateToPage(`roster-view.html?teamId=${teamId}`);
+    }
+
+    function addPlayer(teamId) {
+      navigateToPage(`player-add.html?teamId=${teamId}`);
+    }
+
+    async function shareGroup() {
+      if (!currentGroup) return;
+      
+      const shareData = {
+        title: `Join ${currentGroup.groupName} on Hoopin'`,
+        text: `Group ID: ${currentGroup.groupId}\n\nJoin our basketball team management group!`,
+        url: `${window.location.origin}/group-join.html?groupId=${currentGroup.groupId}`
+      };
+      
+      const shared = await shareData(shareData);
+      if (!shared) {
+        // Fallback already handled by shareData function
+      }
+    }
+
+    // Initialize
+    window.addEventListener('load', async () => {
+      setupCommonElements();
+      await loadGroupInfo();
+      await loadAllTeams();
+    });
+  </script>
+</body>
+</html>

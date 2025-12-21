@@ -1,0 +1,488 @@
+/**
+ * Division-Specific Styles
+ * Baseball-style division system with team colors
+ */
+
+/* ===== Division Badge ===== */
+.division-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: 2px solid;
+  transition: all var(--transition-base);
+}
+
+.division-badge.division-small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.division-badge.division-large {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 1rem;
+}
+
+.division-icon {
+  font-size: 1.25em;
+}
+
+/* D1 - Navy with Red accent */
+.division-badge.division-d1 {
+  background-color: var(--division-d1);
+  border-color: var(--division-d1-accent);
+  color: var(--text-primary);
+  box-shadow: 0 0 20px rgba(186, 12, 47, 0.3);
+}
+
+/* D2 - Cardinal Red with White accent */
+.division-badge.division-d2 {
+  background-color: var(--division-d2);
+  border-color: var(--division-d2-accent);
+  color: var(--text-primary);
+  box-shadow: 0 0 15px rgba(196, 30, 58, 0.3);
+}
+
+/* D3 - Forest Green with Gold accent */
+.division-badge.division-d3 {
+  background-color: var(--division-d3);
+  border-color: var(--division-d3-accent);
+  color: var(--text-primary);
+  box-shadow: 0 0 15px rgba(0, 132, 61, 0.3);
+}
+
+/* NAIA - Gray */
+.division-badge.division-naia {
+  background-color: var(--division-naia);
+  border-color: var(--division-naia-accent);
+  color: var(--text-primary);
+}
+
+/* ===== Division Card ===== */
+.division-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border-left: 4px solid;
+  transition: all var(--transition-base);
+}
+
+.division-card:hover {
+  transform: translateX(8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.division-card.division-d1 {
+  border-left-color: var(--division-d1-accent);
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(0, 45, 98, 0.2) 100%);
+}
+
+.division-card.division-d2 {
+  border-left-color: var(--division-d2);
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(196, 30, 58, 0.2) 100%);
+}
+
+.division-card.division-d3 {
+  border-left-color: var(--division-d3);
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(0, 132, 61, 0.2) 100%);
+}
+
+.division-card.division-naia {
+  border-left-color: var(--division-naia);
+  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(139, 139, 139, 0.2) 100%);
+}
+
+/* ===== Division Header ===== */
+.division-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.division-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.division-title h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.division-stats {
+  display: flex;
+  gap: var(--spacing-lg);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.division-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.division-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.division-stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* ===== Division Team List ===== */
+.division-teams {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.division-team-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.division-team-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+}
+
+.team-rank {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  min-width: 2ch;
+}
+
+.team-photo-small {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  background: var(--secondary-bg);
+}
+
+.team-info-compact {
+  flex: 1;
+}
+
+.team-name-compact {
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+
+.team-manager-compact {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.team-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.team-overall {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--tier-galaxy-opal);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.team-player-count {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* ===== Division Requirements ===== */
+.division-requirements {
+  background: rgba(0, 0, 0, 0.3);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-md);
+}
+
+.division-requirements h4 {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: var(--spacing-sm);
+}
+
+.requirement-list {
+  list-style: none;
+  padding: 0;
+}
+
+.requirement-list li {
+  padding: var(--spacing-xs) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.requirement-list li::before {
+  content: '✓';
+  color: var(--accent-success);
+  font-weight: 700;
+}
+
+.requirement-list li.not-met::before {
+  content: '○';
+  color: var(--text-muted);
+}
+
+/* ===== Division Progress ===== */
+.division-progress {
+  margin-top: var(--spacing-md);
+}
+
+.progress-bar-container {
+  height: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  transition: width var(--transition-base);
+  border-radius: var(--radius-md);
+}
+
+.progress-bar-fill.division-d1 {
+  background: linear-gradient(90deg, var(--division-d1) 0%, var(--division-d1-accent) 100%);
+}
+
+.progress-bar-fill.division-d2 {
+  background: linear-gradient(90deg, var(--division-d2) 0%, var(--division-d2-accent) 100%);
+}
+
+.progress-bar-fill.division-d3 {
+  background: linear-gradient(90deg, var(--division-d3) 0%, var(--division-d3-accent) 100%);
+}
+
+.progress-bar-fill.division-naia {
+  background: var(--division-naia);
+}
+
+.progress-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* ===== Division Standings Table ===== */
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-md);
+}
+
+.standings-table thead {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.standings-table th {
+  padding: var(--spacing-sm);
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.standings-table td {
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.standings-table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+.standings-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ===== Division Empty State ===== */
+.division-empty {
+  text-align: center;
+  padding: var(--spacing-xxl) var(--spacing-lg);
+  color: var(--text-muted);
+}
+
+.division-empty-icon {
+  font-size: 3rem;
+  opacity: 0.5;
+  margin-bottom: var(--spacing-md);
+}
+
+/* ===== Division Filters ===== */
+.division-filters {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.division-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.division-filter-btn {
+  flex: 0 0 auto;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--secondary-bg);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.division-filter-btn.active {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: rgba(0, 188, 212, 0.1);
+}
+
+.division-filter-btn.division-d1.active {
+  border-color: var(--division-d1-accent);
+  color: var(--text-primary);
+  background: var(--division-d1);
+}
+
+.division-filter-btn.division-d2.active {
+  border-color: var(--division-d2);
+  color: var(--text-primary);
+  background: var(--division-d2);
+}
+
+.division-filter-btn.division-d3.active {
+  border-color: var(--division-d3-accent);
+  color: var(--text-primary);
+  background: var(--division-d3);
+}
+
+.division-filter-btn.division-naia.active {
+  border-color: var(--division-naia-accent);
+  color: var(--text-primary);
+  background: var(--division-naia);
+}
+
+/* ===== Division Summary ===== */
+.division-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.division-summary-card {
+  background: var(--card-bg);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  border-top: 4px solid;
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.division-summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.division-summary-card.division-d1 {
+  border-top-color: var(--division-d1-accent);
+}
+
+.division-summary-card.division-d2 {
+  border-top-color: var(--division-d2);
+}
+
+.division-summary-card.division-d3 {
+  border-top-color: var(--division-d3-accent);
+}
+
+.division-summary-card.division-naia {
+  border-top-color: var(--division-naia);
+}
+
+.division-summary-icon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.division-summary-count {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: var(--spacing-xs);
+}
+
+.division-summary-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+/* ===== Mobile Adjustments ===== */
+@media (max-width: 768px) {
+  .division-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .division-stats {
+    width: 100%;
+    justify-content: space-around;
+  }
+  
+  .division-team-item {
+    flex-wrap: wrap;
+  }
+  
+  .team-rating {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-sm);
+  }
+  
+  .standings-table {
+    font-size: 0.875rem;
+  }
+  
+  .standings-table th,
+  .standings-table td {
+    padding: var(--spacing-xs);
+  }
+}

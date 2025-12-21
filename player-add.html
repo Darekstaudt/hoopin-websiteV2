@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0b1e2d">
+  <title>Add Player - Hoopin'</title>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/animations.css">
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <button class="btn btn-icon" data-action="back">← Back</button>
+      <div class="logo">🏀 Hoopin'</div>
+      <div style="width: 44px;"></div>
+    </div>
+  </header>
+
+  <div class="container page-transition">
+    <div class="form-container">
+      <div class="form-card">
+        <h1 class="text-center" id="formTitle">Add Player</h1>
+        
+        <!-- Live Calculation Display -->
+        <div class="live-calculation">
+          <div class="calculation-result">
+            <div class="overall-display" id="overallDisplay">0</div>
+            <div id="tierBadge"></div>
+          </div>
+          
+          <div class="calculation-breakdown">
+            <div class="breakdown-item">
+              <div class="breakdown-label">Base Stats</div>
+              <div class="breakdown-value" id="baseTotal">0</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-label">Cap Breakers</div>
+              <div class="breakdown-value" id="capTotal">0</div>
+            </div>
+          </div>
+        </div>
+
+        <form id="playerForm" onsubmit="handleSubmit(event)">
+          <!-- Player Name -->
+          <div class="form-group required">
+            <label for="playerName">Player Name</label>
+            <input type="text" id="playerName" required maxlength="50">
+          </div>
+
+          <!-- Player Photo -->
+          <div class="form-group">
+            <label for="playerPhoto">Player Photo (Optional)</label>
+            <div class="file-upload">
+              <input type="file" id="playerPhoto" accept="image/*">
+              <div class="file-upload-label">📷 Upload Photo</div>
+            </div>
+            <div class="file-preview" id="photoPreview">
+              <img id="photoPreviewImg" alt="Player photo">
+            </div>
+          </div>
+
+          <input type="hidden" id="playerPhotoData">
+
+          <!-- Base Stats -->
+          <h3>Base Stats (0-100 total)</h3>
+          
+          <div class="range-group">
+            <div class="range-label">
+              <label>Face</label>
+              <span class="range-value" id="faceValue">0</span>
+            </div>
+            <input type="range" id="face" min="0" max="15" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-15 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Eyes</label>
+              <span class="range-value" id="eyesValue">0</span>
+            </div>
+            <input type="range" id="eyes" min="0" max="5" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-5 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Hair</label>
+              <span class="range-value" id="hairValue">0</span>
+            </div>
+            <input type="range" id="hair" min="0" max="5" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-5 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Top</label>
+              <span class="range-value" id="topValue">0</span>
+            </div>
+            <input type="range" id="top" min="0" max="5" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-5 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Bottom</label>
+              <span class="range-value" id="bottomValue">0</span>
+            </div>
+            <input type="range" id="bottom" min="0" max="5" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-5 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Fitness</label>
+              <span class="range-value" id="fitnessValue">0</span>
+            </div>
+            <input type="range" id="fitness" min="0" max="15" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-15 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>History</label>
+              <span class="range-value" id="historyValue">0</span>
+            </div>
+            <input type="range" id="history" min="0" max="10" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-10 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Personality</label>
+              <span class="range-value" id="personalityValue">0</span>
+            </div>
+            <input type="range" id="personality" min="0" max="20" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-20 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Tolerance</label>
+              <span class="range-value" id="toleranceValue">0</span>
+            </div>
+            <input type="range" id="tolerance" min="0" max="10" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-10 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Substances</label>
+              <span class="range-value" id="substancesValue">0</span>
+            </div>
+            <input type="range" id="substances" min="0" max="10" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-10 points</span>
+          </div>
+
+          <!-- Cap Breakers -->
+          <h3 style="margin-top: 2rem;">Cap Breakers (0-8 bonus)</h3>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Athletic/Build</label>
+              <span class="range-value" id="athleticValue">0</span>
+            </div>
+            <input type="range" id="athletic" min="0" max="2" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-2 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Height</label>
+              <span class="range-value" id="heightValue">0</span>
+            </div>
+            <input type="range" id="height" min="0" max="1" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-1 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Attractiveness</label>
+              <span class="range-value" id="attractivenessValue">0</span>
+            </div>
+            <input type="range" id="attractiveness" min="0" max="2" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-2 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Into You</label>
+              <span class="range-value" id="intoYouValue">0</span>
+            </div>
+            <input type="range" id="intoYou" min="0" max="1" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-1 points</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-label">
+              <label>Comfort</label>
+              <span class="range-value" id="comfortValue">0</span>
+            </div>
+            <input type="range" id="comfort" min="0" max="2" value="0" oninput="updateCalculation()">
+            <span class="help-text">0-2 points</span>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Save Player</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="autosave-indicator" id="autosaveIndicator"></div>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/performance.js"></script>
+  <script src="js/image-optimizer.js"></script>
+  <script src="js/db-manager.js"></script>
+  <script src="js/ratings.js"></script>
+  <script src="js/groups.js"></script>
+  <script src="js/teams.js"></script>
+  <script src="js/players.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    let playerPhotoBase64 = '';
+    let teamId = null;
+    let isEditing = false;
+    let editingPlayerId = null;
+
+    function updateCalculation() {
+      const stats = {
+        face: parseInt(document.getElementById('face').value),
+        eyes: parseInt(document.getElementById('eyes').value),
+        hair: parseInt(document.getElementById('hair').value),
+        top: parseInt(document.getElementById('top').value),
+        bottom: parseInt(document.getElementById('bottom').value),
+        fitness: parseInt(document.getElementById('fitness').value),
+        history: parseInt(document.getElementById('history').value),
+        personality: parseInt(document.getElementById('personality').value),
+        tolerance: parseInt(document.getElementById('tolerance').value),
+        substances: parseInt(document.getElementById('substances').value)
+      };
+
+      const capBreakers = {
+        athletic: parseInt(document.getElementById('athletic').value),
+        height: parseInt(document.getElementById('height').value),
+        attractiveness: parseInt(document.getElementById('attractiveness').value),
+        intoYou: parseInt(document.getElementById('intoYou').value),
+        comfort: parseInt(document.getElementById('comfort').value)
+      };
+
+      // Update display values
+      Object.keys(stats).forEach(key => {
+        document.getElementById(`${key}Value`).textContent = stats[key];
+      });
+      Object.keys(capBreakers).forEach(key => {
+        document.getElementById(`${key}Value`).textContent = capBreakers[key];
+      });
+
+      const ratings = ratingsCalculator.calculatePlayerRatings(stats, capBreakers);
+      
+      document.getElementById('baseTotal').textContent = ratings.baseTotal;
+      document.getElementById('capTotal').textContent = ratings.capBreakerTotal;
+      document.getElementById('overallDisplay').textContent = ratings.overall;
+      
+      const tier = ratingsCalculator.getTier(ratings.overall);
+      document.getElementById('tierBadge').innerHTML = `
+        <div class="tier-badge tier-${tier.class.replace('tier-', '')}" style="background: ${tier.gradient}; margin: 1rem auto; max-width: 200px;">
+          <div class="tier-name">${tier.name}</div>
+          <div class="tier-rarity">${tier.rarity}</div>
+        </div>
+      `;
+
+      autosaveDraft();
+    }
+
+    const autosaveDraft = debounce(() => {
+      const stats = {
+        face: parseInt(document.getElementById('face').value),
+        eyes: parseInt(document.getElementById('eyes').value),
+        hair: parseInt(document.getElementById('hair').value),
+        top: parseInt(document.getElementById('top').value),
+        bottom: parseInt(document.getElementById('bottom').value),
+        fitness: parseInt(document.getElementById('fitness').value),
+        history: parseInt(document.getElementById('history').value),
+        personality: parseInt(document.getElementById('personality').value),
+        tolerance: parseInt(document.getElementById('tolerance').value),
+        substances: parseInt(document.getElementById('substances').value)
+      };
+
+      const capBreakers = {
+        athletic: parseInt(document.getElementById('athletic').value),
+        height: parseInt(document.getElementById('height').value),
+        attractiveness: parseInt(document.getElementById('attractiveness').value),
+        intoYou: parseInt(document.getElementById('intoYou').value),
+        comfort: parseInt(document.getElementById('comfort').value)
+      };
+
+      session.set('playerDraft', {
+        playerName: document.getElementById('playerName').value,
+        stats,
+        capBreakers,
+        playerPhoto: playerPhotoBase64,
+        teamId
+      });
+
+      const indicator = document.getElementById('autosaveIndicator');
+      indicator.textContent = '💾 Draft saved';
+      indicator.className = 'autosave-indicator saved show';
+      setTimeout(() => indicator.classList.remove('show'), 2000);
+    }, 1000);
+
+    setupImageUpload('playerPhoto', 'photoPreview', (compressed) => {
+      playerPhotoBase64 = compressed;
+      document.getElementById('playerPhotoData').value = compressed;
+    });
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      
+      if (!teamId) {
+        showToast('No team selected', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = isEditing ? 'Updating...' : 'Saving...';
+      showLoading(isEditing ? 'Updating player...' : 'Adding player...');
+
+      try {
+        const playerData = {
+          playerName: document.getElementById('playerName').value,
+          playerPhoto: playerPhotoBase64,
+          teamId,
+          stats: {
+            face: parseInt(document.getElementById('face').value),
+            eyes: parseInt(document.getElementById('eyes').value),
+            hair: parseInt(document.getElementById('hair').value),
+            top: parseInt(document.getElementById('top').value),
+            bottom: parseInt(document.getElementById('bottom').value),
+            fitness: parseInt(document.getElementById('fitness').value),
+            history: parseInt(document.getElementById('history').value),
+            personality: parseInt(document.getElementById('personality').value),
+            tolerance: parseInt(document.getElementById('tolerance').value),
+            substances: parseInt(document.getElementById('substances').value)
+          },
+          capBreakers: {
+            athletic: parseInt(document.getElementById('athletic').value),
+            height: parseInt(document.getElementById('height').value),
+            attractiveness: parseInt(document.getElementById('attractiveness').value),
+            intoYou: parseInt(document.getElementById('intoYou').value),
+            comfort: parseInt(document.getElementById('comfort').value)
+          }
+        };
+
+        let result;
+        if (isEditing) {
+          result = await playerManager.updatePlayer(editingPlayerId, playerData);
+        } else {
+          result = await playerManager.createPlayer(playerData);
+        }
+
+        hideLoading();
+
+        if (result.success) {
+          showToast(isEditing ? 'Player updated!' : 'Player added!', 'success');
+          session.remove('playerDraft');
+          
+          setTimeout(() => {
+            navigateToPage(`roster-view.html?teamId=${teamId}`);
+          }, 1000);
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        hideLoading();
+        console.error('Submit error:', error);
+        showToast(error.message || 'Failed to save player', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = isEditing ? 'Update Player' : 'Save Player';
+      }
+    }
+
+    window.addEventListener('load', async () => {
+      setupCommonElements();
+      
+      const params = getQueryParams();
+      teamId = params.teamId;
+      
+      if (!teamId) {
+        showToast('No team specified', 'error');
+        setTimeout(() => navigateToPage('dashboard.html'), 2000);
+        return;
+      }
+
+      if (params.playerId) {
+        isEditing = true;
+        editingPlayerId = params.playerId;
+        document.getElementById('formTitle').textContent = 'Edit Player';
+        document.getElementById('submitBtn').textContent = 'Update Player';
+        
+        showLoading('Loading player...');
+        const player = await playerManager.getPlayer(editingPlayerId);
+        hideLoading();
+        
+        if (player) {
+          document.getElementById('playerName').value = player.playerName;
+          
+          Object.keys(player.stats).forEach(key => {
+            document.getElementById(key).value = player.stats[key];
+          });
+          Object.keys(player.capBreakers).forEach(key => {
+            document.getElementById(key).value = player.capBreakers[key];
+          });
+          
+          if (player.playerPhoto) {
+            playerPhotoBase64 = player.playerPhoto;
+            document.getElementById('photoPreviewImg').src = player.playerPhoto;
+            document.getElementById('photoPreview').classList.add('show');
+          }
+          
+          updateCalculation();
+        }
+      } else {
+        const draft = session.get('playerDraft');
+        if (draft && draft.teamId === teamId) {
+          document.getElementById('playerName').value = draft.playerName || '';
+          
+          if (draft.stats) {
+            Object.keys(draft.stats).forEach(key => {
+              document.getElementById(key).value = draft.stats[key];
+            });
+          }
+          if (draft.capBreakers) {
+            Object.keys(draft.capBreakers).forEach(key => {
+              document.getElementById(key).value = draft.capBreakers[key];
+            });
+          }
+          if (draft.playerPhoto) {
+            playerPhotoBase64 = draft.playerPhoto;
+            document.getElementById('photoPreviewImg').src = draft.playerPhoto;
+            document.getElementById('photoPreview').classList.add('show');
+          }
+          
+          updateCalculation();
+        } else {
+          updateCalculation();
+        }
+      }
+
+      document.getElementById('playerName').addEventListener('input', autosaveDraft);
+    });
+  </script>
+</body>
+</html>
