@@ -177,16 +177,16 @@
     }
 
     function addPlayer() {
-      navigateToPage(`player-add.html?teamId=${teamId}`);
+      navigateToPage('player-add.html', { teamId: teamId });
     }
 
     function viewPlayer(playerId) {
-      navigateToPage(`player-card.html?playerId=${playerId}`);
+      navigateToPage('player-card.html', { playerId: playerId });
     }
 
     function showTeamMenu() {
       const actions = [
-        { label: 'Edit Team', action: () => navigateToPage(`team-create.html?teamId=${teamId}`) },
+        { label: 'Edit Team', action: () => navigateToPage('team-create.html', { teamId: teamId }) },
         { label: 'Share Team', action: shareTeam },
         { label: 'Delete Team', action: deleteTeam }
       ];

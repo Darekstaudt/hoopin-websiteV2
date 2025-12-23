@@ -244,7 +244,7 @@
           const count = summary.byDivision[key] || 0;
           const card = document.createElement('div');
           card.className = `division-summary-card division-${key.toLowerCase()}`;
-          card.onclick = () => navigateToPage(`divisions.html?division=${key}`);
+          card.onclick = () => navigateToPage('divisions.html', { division: key });
           
           card.innerHTML = `
             <div class="division-summary-icon">${division.icon}</div>
@@ -382,11 +382,11 @@
     }
 
     function viewTeam(teamId) {
-      navigateToPage(`roster-view.html?teamId=${teamId}`);
+      navigateToPage('roster-view.html', { teamId: teamId });
     }
 
     function addPlayer(teamId) {
-      navigateToPage(`player-add.html?teamId=${teamId}`);
+      navigateToPage('player-add.html', { teamId: teamId });
     }
 
     async function shareGroup() {

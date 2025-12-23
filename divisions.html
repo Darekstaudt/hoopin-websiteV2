@@ -146,7 +146,7 @@
       teams.forEach((team, index) => {
         const item = document.createElement('div');
         item.className = 'division-team-item';
-        item.onclick = () => navigateToPage(`roster-view.html?teamId=${team.teamId}`);
+        item.onclick = () => navigateToPage('roster-view.html', { teamId: team.teamId });
 
         item.innerHTML = `
           <div class="team-rank">#${index + 1}</div>
