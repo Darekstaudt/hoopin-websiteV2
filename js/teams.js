@@ -161,11 +161,8 @@ class TeamManager {
         return { starters: [], bench: [] };
       }
 
-      const players = await this.getTeamPlayers(teamId);
-      
       // Players are already sorted by overall descending from getTeamPlayers()
-      // Sort by overall descending to ensure consistent ordering
-      players.sort((a, b) => b.overall - a.overall);
+      const players = await this.getTeamPlayers(teamId);
       
       const starters = [];
       const bench = [];
