@@ -13,7 +13,10 @@
   transition: all var(--transition-base);
   overflow: hidden;
   min-width: 280px;
+  min-height: 320px;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 .player-card::before {
@@ -36,63 +39,139 @@
   height: 8px;
 }
 
-/* ===== Tier-Specific Cards ===== */
+/* ===== Player Card Overall (Top-Left) ===== */
+.player-card-overall {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+/* ===== Player Card Photo (Middle-Left) ===== */
+.player-card-photo-left {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  background: var(--secondary-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.player-card-photo-left img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+/* ===== Player Card Stats List (Right Side) ===== */
+.player-card-stats-list {
+  position: absolute;
+  left: 110px;
+  top: 60px;
+  right: 16px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+.player-card-stats-list .stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.player-card-stats-list .stat-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.player-card-stats-list .stat-value {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* ===== Player Card Name (Bottom Center) ===== */
+.player-card-name-bottom {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Tier-Specific Cards (Full Gradient Background) ===== */
 .player-card.tier-dark-matter {
-  background: linear-gradient(135deg, #1a0033 0%, #2a0052 100%);
+  background: linear-gradient(135deg, #4a0e4e 0%, #81167a 50%, #c21d9e 100%);
   border: 2px solid #ff00ff;
   box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
 }
 
 .player-card.tier-galaxy-opal {
-  background: linear-gradient(135deg, #2d1b4e 0%, #3a2564 100%);
+  background: linear-gradient(135deg, #2d1b69 0%, #6a1b9a 33%, #4a148c 66%, #d946ef 100%);
   border: 2px solid #f093fb;
   box-shadow: 0 0 25px rgba(240, 147, 251, 0.4);
 }
 
 .player-card.tier-pink-diamond {
-  background: linear-gradient(135deg, #4a1942 0%, #5c2352 100%);
+  background: linear-gradient(135deg, #c2185b 0%, #e91e63 50%, #f50057 100%);
   border: 2px solid #ff69b4;
   box-shadow: 0 0 25px rgba(255, 105, 180, 0.4);
 }
 
 .player-card.tier-diamond {
-  background: linear-gradient(135deg, #0a2540 0%, #143a5c 100%);
+  background: linear-gradient(135deg, #0d47a1 0%, #1976d2 50%, #2196f3 100%);
   border: 2px solid #00bfff;
   box-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
 }
 
 .player-card.tier-amethyst {
-  background: linear-gradient(135deg, #2a1f40 0%, #3d2e5c 100%);
+  background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 50%, #9c27b0 100%);
   border: 2px solid #b19cd9;
 }
 
 .player-card.tier-ruby {
-  background: linear-gradient(135deg, #3d1226 0%, #4f1a34 100%);
+  background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 50%, #e57373 100%);
   border: 2px solid #ff6b9d;
 }
 
 .player-card.tier-sapphire {
-  background: linear-gradient(135deg, #0f1f3d 0%, #1a2d52 100%);
+  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%);
   border: 2px solid #4169e1;
 }
 
 .player-card.tier-emerald {
-  background: linear-gradient(135deg, #0d2e1f 0%, #163d2a 100%);
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #43a047 100%);
   border: 2px solid #50c878;
 }
 
 .player-card.tier-gold {
-  background: linear-gradient(135deg, #3d2f0d 0%, #4f3d14 100%);
+  background: linear-gradient(135deg, #f57f17 0%, #fbc02d 50%, #fdd835 100%);
   border: 2px solid #ffd700;
 }
 
 .player-card.tier-silver {
-  background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+  background: linear-gradient(135deg, #616161 0%, #757575 50%, #9e9e9e 100%);
   border: 2px solid #c0c0c0;
 }
 
 .player-card.tier-bronze {
-  background: linear-gradient(135deg, #2d1f0d 0%, #3d2914 100%);
+  background: linear-gradient(135deg, #4e342e 0%, #5d4037 50%, #6d4c41 100%);
   border: 2px solid #cd7f32;
 }
 

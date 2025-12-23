@@ -161,26 +161,27 @@ class TeamManager {
         return { starters: [], bench: [] };
       }
 
+      // Players are already sorted by overall descending from getTeamPlayers()
       const players = await this.getTeamPlayers(teamId);
       
-      // Organize into starters and bench based on team roster
       const starters = [];
       const bench = [];
 
-      for (const player of players) {
-        if (team.roster.starters.includes(player.playerId)) {
+      // AUTO-ASSIGN: Top 5 players go to Starting 5, rest to Bench
+      players.forEach((player, index) => {
+        if (index < 5) {
           starters.push(player);
-        } else if (team.roster.bench.includes(player.playerId)) {
-          bench.push(player);
         } else {
-          // Auto-assign: top 5 are starters, rest are bench
-          if (starters.length < 5) {
-            starters.push(player);
-          } else {
-            bench.push(player);
-          }
+          bench.push(player);
         }
-      }
+      });
+
+      // Update team roster in database
+      team.roster = {
+        starters: starters.map(p => p.playerId),
+        bench: bench.map(p => p.playerId)
+      };
+      await dbManager.save('teams', teamId, team);
 
       return { starters, bench };
     } catch (error) {
