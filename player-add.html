@@ -384,7 +384,7 @@
           session.remove('playerDraft');
           
           setTimeout(() => {
-            navigateToPage(`roster-view.html?teamId=${teamId}`);
+            navigateToPage('roster-view.html', { teamId: teamId });
           }, 1000);
         } else {
           throw new Error(result.error);

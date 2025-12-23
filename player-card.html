@@ -127,7 +127,10 @@
 
     function editPlayer() {
       if (!currentPlayer) return;
-      navigateToPage(`player-add.html?teamId=${currentPlayer.teamId}&playerId=${currentPlayer.playerId}`);
+      navigateToPage('player-add.html', { 
+        teamId: currentPlayer.teamId, 
+        playerId: currentPlayer.playerId 
+      });
     }
 
     async function sharePlayer() {
@@ -150,7 +153,7 @@
       if (result.success) {
         showToast('Player deleted', 'success');
         setTimeout(() => {
-          navigateToPage(`roster-view.html?teamId=${currentPlayer.teamId}`);
+          navigateToPage('roster-view.html', { teamId: currentPlayer.teamId });
         }, 1000);
       } else {
         showToast('Failed to delete player', 'error');
