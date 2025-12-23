@@ -62,7 +62,7 @@ function showLoading(message = 'Loading...') {
   const existingLoader = document.querySelector('.loading-overlay');
   if (existingLoader) return;
 
-  const loader = document.createElement('div');
+  const loader = document. createElement('div');
   loader.className = 'loading-overlay';
   loader.innerHTML = `
     <div class="loading-spinner">
@@ -87,7 +87,7 @@ function showToast(message, type = 'info', duration = 3000) {
   toast.className = `toast toast-${type}`;
   toast.textContent = message;
   
-  document.body.appendChild(toast);
+  document.body. appendChild(toast);
   
   // Trigger animation
   setTimeout(() => toast.classList.add('show'), 10);
@@ -140,14 +140,32 @@ function safeJSONParse(str, fallback = null) {
   }
 }
 
-// Get query parameters
+// Get query parameters - FIXED VERSION
 function getQueryParams() {
   const params = {};
   const searchParams = new URLSearchParams(window.location.search);
   for (const [key, value] of searchParams) {
-    params[key] = value;
+    params[key] = decodeURIComponent(value);
   }
   return params;
+}
+
+// Build URL with parameters - FIXED VERSION
+function buildUrl(page, params) {
+  let url = page;
+  if (params && Object.keys(params).length > 0) {
+    const paramString = Object.keys(params)
+      .map(key => `${key}=${encodeURIComponent(params[key])}`)
+      .join('&');
+    url += '?' + paramString;
+  }
+  return url;
+}
+
+// Navigate to page with parameters - NEW HELPER
+function navigateTo(page, params) {
+  const url = buildUrl(page, params);
+  window.location.href = url;
 }
 
 // Set query parameter
@@ -176,7 +194,7 @@ function isIOS() {
 
 // Sanitize HTML to prevent XSS
 function sanitizeHTML(str) {
-  const div = document.createElement('div');
+  const div = document. createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
@@ -207,7 +225,7 @@ async function copyToClipboard(text) {
 async function shareData(data) {
   if (navigator.share) {
     try {
-      await navigator.share(data);
+      await navigator. share(data);
       return true;
     } catch (err) {
       if (err.name !== 'AbortError') {
@@ -218,7 +236,7 @@ async function shareData(data) {
   } else {
     // Fallback to copy
     if (data.url) {
-      return await copyToClipboard(data.url);
+      return await copyToClipboard(data. url);
     } else if (data.text) {
       return await copyToClipboard(data.text);
     }
@@ -241,7 +259,7 @@ const storage = {
   get(key, fallback = null) {
     try {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : fallback;
+      return item ?  JSON.parse(item) : fallback;
     } catch (e) {
       console.error('localStorage get error:', e);
       return fallback;
@@ -293,7 +311,7 @@ const session = {
   
   remove(key) {
     try {
-      sessionStorage.removeItem(key);
+      sessionStorage. removeItem(key);
       return true;
     } catch (e) {
       console.error('sessionStorage remove error:', e);
@@ -301,3 +319,31 @@ const session = {
     }
   }
 };
+
+// Expose to window for global access
+window.generateId = generateId;
+window. hashPassword = hashPassword;
+window.formatDate = formatDate;
+window.debounce = debounce;
+window.throttle = throttle;
+window.showLoading = showLoading;
+window.hideLoading = hideLoading;
+window.showToast = showToast;
+window.validateForm = validateForm;
+window. deepClone = deepClone;
+window.safeJSONParse = safeJSONParse;
+window.getQueryParams = getQueryParams;
+window.buildUrl = buildUrl;
+window. navigateTo = navigateTo;
+window.setQueryParam = setQueryParam;
+window.removeQueryParam = removeQueryParam;
+window.isMobileDevice = isMobileDevice;
+window.isIOS = isIOS;
+window.sanitizeHTML = sanitizeHTML;
+window.formatFileSize = formatFileSize;
+window.copyToClipboard = copyToClipboard;
+window.shareData = shareData;
+window.storage = storage;
+window.session = session;
+
+console.log('✅ Utils loaded');
