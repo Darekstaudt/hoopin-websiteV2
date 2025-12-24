@@ -253,7 +253,7 @@ class RatingsCalculator {
   calculatePlayerRatings(stats, capBreakers) {
     const baseTotal = this.calculateBaseTotal(stats);
     const capBreakerTotal = this.calculateCapBreakerTotal(capBreakers);
-    const overall = Math.round(baseTotal + capBreakerTotal); // Round overall to whole number
+    const overall = Math.min(Math.round(baseTotal + capBreakerTotal), MAX_OVERALL); // Ensure it doesn't exceed max
     const tier = this.getTier(overall);
 
     return {

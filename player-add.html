@@ -273,13 +273,20 @@
     let editingPlayerId = null;
 
     // Convert old weighted values to 0-100 slider values
+    // Strategy: If value is suspiciously low for a 0-100 scale (< 50), 
+    // AND is within the old weighted range, we convert it.
+    // This isn't perfect but handles most real-world cases.
     function convertOldToNewScale(oldValue, maxWeight) {
-      // If value is already in 0-100 range (greater than maxWeight), return as is
-      if (oldValue > maxWeight) {
+      // If value is clearly in 0-100 range (> maxWeight * 2), return as is
+      if (oldValue > maxWeight * 2) {
         return oldValue;
       }
-      // Convert old weighted value to 0-100 scale
-      return Math.round((oldValue / maxWeight) * 100);
+      // If value is within weighted range and suspiciously low, convert it
+      if (oldValue <= maxWeight) {
+        return Math.round((oldValue / maxWeight) * 100);
+      }
+      // Otherwise return as is (assume it's already 0-100)
+      return oldValue;
     }
 
     function updateCalculation() {
