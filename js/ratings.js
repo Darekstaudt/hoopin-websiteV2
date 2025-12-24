@@ -18,7 +18,7 @@ const TIER_THRESHOLDS = [
   { 
     name: 'Dark Matter', 
     min: 99, 
-    max: 108,
+    max: 109,
     class: 'tier-dark-matter', 
     rarity: 'Legendary', 
     color: '#ff00ff',
@@ -140,20 +140,63 @@ const CAP_BREAKERS = {
 };
 
 const MAX_BASE_TOTAL = 100;
-const MAX_CAP_BREAKER_TOTAL = 8;
-const MAX_OVERALL = 108;
+const MAX_CAP_BREAKER_TOTAL = 9;
+const MAX_OVERALL = 109;
 
 class RatingsCalculator {
   /**
+   * Get base stat weight mappings
+   */
+  getBaseWeights() {
+    return {
+      face: 15,
+      eyes: 5,
+      hair: 5,
+      top: 5,
+      bottom: 5,
+      fitness: 15,
+      history: 10,
+      personality: 20,
+      tolerance: 10,
+      substances: 10
+    };
+  }
+
+  /**
+   * Get cap breaker weight mappings
+   */
+  getCapBreakerWeights() {
+    return {
+      athletic: 2,
+      height: 1,
+      attractiveness: 2,
+      intoYou: 1,
+      comfort: 3
+    };
+  }
+
+  /**
+   * Convert 0-100 slider value to weighted points
+   */
+  convertToWeighted(sliderValue, maxWeight) {
+    return (sliderValue / 100) * maxWeight;
+  }
+
+  /**
    * Calculate base stats total
+   * Now expects stats values to be 0-100 and converts to weighted points
    */
   calculateBaseTotal(stats) {
     if (!stats) return 0;
     
+    const baseWeights = this.getBaseWeights();
     let total = 0;
-    for (const [key, limits] of Object.entries(BASE_STATS)) {
-      const value = parseInt(stats[key]) || 0;
-      total += Math.max(limits.min, Math.min(limits.max, value));
+    
+    for (const [key, weight] of Object.entries(baseWeights)) {
+      const sliderValue = parseInt(stats[key]) || 0;
+      // Convert 0-100 slider value to weighted points
+      const weighted = this.convertToWeighted(sliderValue, weight);
+      total += weighted;
     }
     
     return Math.min(total, MAX_BASE_TOTAL);
@@ -161,14 +204,19 @@ class RatingsCalculator {
 
   /**
    * Calculate cap breakers total
+   * Now expects cap breaker values to be 0-100 and converts to weighted points
    */
   calculateCapBreakerTotal(capBreakers) {
     if (!capBreakers) return 0;
     
+    const capWeights = this.getCapBreakerWeights();
     let total = 0;
-    for (const [key, limits] of Object.entries(CAP_BREAKERS)) {
-      const value = parseInt(capBreakers[key]) || 0;
-      total += Math.max(limits.min, Math.min(limits.max, value));
+    
+    for (const [key, weight] of Object.entries(capWeights)) {
+      const sliderValue = parseInt(capBreakers[key]) || 0;
+      // Convert 0-100 slider value to weighted points
+      const weighted = this.convertToWeighted(sliderValue, weight);
+      total += weighted;
     }
     
     return Math.min(total, MAX_CAP_BREAKER_TOTAL);
@@ -203,12 +251,12 @@ class RatingsCalculator {
   calculatePlayerRatings(stats, capBreakers) {
     const baseTotal = this.calculateBaseTotal(stats);
     const capBreakerTotal = this.calculateCapBreakerTotal(capBreakers);
-    const overall = baseTotal + capBreakerTotal;
+    const overall = Math.round(baseTotal + capBreakerTotal); // Round overall to whole number
     const tier = this.getTier(overall);
 
     return {
-      baseTotal,
-      capBreakerTotal,
+      baseTotal: Math.round(baseTotal * 10) / 10, // Round to 1 decimal place
+      capBreakerTotal: Math.round(capBreakerTotal * 10) / 10, // Round to 1 decimal place
       overall,
       tier: tier.name,
       tierClass: tier.class,
