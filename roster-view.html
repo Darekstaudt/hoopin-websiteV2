@@ -307,24 +307,16 @@
           // Different containers - swap between starters and bench
           if (container1 === 'startersContainer') {
             // Player 1 from starters to bench, Player 2 from bench to starters
-            // Remove both first, then insert at original positions
-            const tempPlayerId1 = playerId1;
-            const tempPlayerId2 = playerId2;
             starterIds.splice(idx1Starters, 1);
             benchIds.splice(idx2Bench, 1);
-            // Insert at original positions
-            starterIds.splice(idx1Starters, 0, tempPlayerId2);
-            benchIds.push(tempPlayerId1); // Add to end of bench
+            starterIds.splice(idx1Starters, 0, playerId2);
+            benchIds.push(playerId1); // Add to end of bench
           } else {
             // Player 1 from bench to starters, Player 2 from starters to bench
-            // Remove both first, then insert at original positions
-            const tempPlayerId1 = playerId1;
-            const tempPlayerId2 = playerId2;
             benchIds.splice(idx1Bench, 1);
             starterIds.splice(idx2Starters, 1);
-            // Insert at original positions
-            starterIds.splice(idx2Starters, 0, tempPlayerId1);
-            benchIds.push(tempPlayerId2); // Add to end of bench
+            starterIds.splice(idx2Starters, 0, playerId1);
+            benchIds.push(playerId2); // Add to end of bench
           }
         }
         
