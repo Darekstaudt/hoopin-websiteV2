@@ -354,14 +354,12 @@
           bench: newBench
         });
         
-        // Update the team roster
-        team.roster = {
-          starters: newStarters,
-          bench: newBench
-        };
+        // Use the existing updateRoster method
+        const result = await teamManager.updateRoster(teamId, newStarters, newBench);
         
-        // Save to database
-        await dbManager.save('teams', teamId, team);
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to update roster');
+        }
         
         console.log('✅ Roster saved to database');
         
@@ -370,15 +368,13 @@
         // Exit swap mode
         cancelSwap();
         
-        // Reload the roster view
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
+        // Refresh the roster view without full page reload
+        hideLoading();
+        await loadTeamRoster();
         
       } catch (error) {
         console.error('❌ Swap error:', error);
         showToast('Failed to swap players: ' + error.message, 'error');
-      } finally {
         hideLoading();
       }
     }
