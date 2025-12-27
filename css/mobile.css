@@ -519,19 +519,41 @@ img[data-src].loaded {
 
 /* ===== Mobile Header Improvements ===== */
 @media (max-width: 768px) {
-  /* Smaller back button and menu button */
+  /* Make header buttons minimal - no large backgrounds */
   header .btn-icon {
-    padding: 0.4rem 0.6rem;
+    padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
     min-width: auto;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--text-primary);
+  }
+  
+  header .btn-icon:hover,
+  header .btn-icon:active {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  header .container {
+    padding: 0.5rem 0.75rem;
   }
   
   header .logo {
     font-size: 1rem;
+    flex: 1;
+    text-align: center;
   }
   
   header .logo span {
     font-size: 1rem;
+  }
+}
+
+/* Desktop - keep normal styling */
+@media (min-width: 769px) {
+  header .btn-icon {
+    padding: 0.5rem 1rem;
   }
 }
 

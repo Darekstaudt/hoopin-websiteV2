@@ -82,6 +82,9 @@
   <script>
     let teamId = null;
     let currentTeam = null;
+    let draggedElement = null;
+    let draggedPlayerId = null;
+    let draggedContainer = null;
 
     async function loadTeamRoster() {
       if (!teamId) return;
@@ -138,10 +141,28 @@
 
       container.innerHTML = '';
       
-      players.forEach(player => {
+      players.forEach((player, index) => {
         const card = document.createElement('div');
         card.className = `player-card ${player.tierClass} gpu-accelerated`;
-        card.onclick = () => viewPlayer(player.playerId);
+        card.draggable = true;
+        card.dataset.playerId = player.playerId;
+        card.dataset.container = containerId;
+        
+        // Drag event handlers
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragover', handleDragOver);
+        card.addEventListener('drop', handleDrop);
+        card.addEventListener('dragend', handleDragEnd);
+        card.addEventListener('dragenter', handleDragEnter);
+        card.addEventListener('dragleave', handleDragLeave);
+        
+        // Click handler for viewing details
+        card.addEventListener('click', (e) => {
+          // Only navigate if not currently dragging
+          if (!draggedElement) {
+            viewPlayer(player.playerId);
+          }
+        });
         
         // Build stats list
         const stats = player.stats || {};
@@ -185,6 +206,129 @@
         
         container.appendChild(card);
       });
+    }
+
+    function handleDragStart(e) {
+      draggedElement = e.target;
+      draggedPlayerId = e.target.dataset.playerId;
+      draggedContainer = e.target.dataset.container;
+      
+      e.target.style.opacity = '0.5';
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', e.target.innerHTML);
+    }
+
+    function handleDragOver(e) {
+      if (e.preventDefault) {
+        e.preventDefault();
+      }
+      e.dataTransfer.dropEffect = 'move';
+      return false;
+    }
+
+    function handleDragEnter(e) {
+      if (e.target.classList.contains('player-card')) {
+        e.target.classList.add('drag-over');
+      }
+    }
+
+    function handleDragLeave(e) {
+      if (e.target.classList.contains('player-card')) {
+        e.target.classList.remove('drag-over');
+      }
+    }
+
+    function handleDrop(e) {
+      if (e.stopPropagation) {
+        e.stopPropagation();
+      }
+      
+      const targetCard = e.target.closest('.player-card');
+      if (!targetCard) return false;
+      
+      targetCard.classList.remove('drag-over');
+      
+      if (draggedElement !== targetCard) {
+        const targetPlayerId = targetCard.dataset.playerId;
+        const targetContainer = targetCard.dataset.container;
+        
+        // Perform the swap/move
+        swapPlayers(draggedPlayerId, targetPlayerId, draggedContainer, targetContainer);
+      }
+      
+      return false;
+    }
+
+    function handleDragEnd(e) {
+      e.target.style.opacity = '1';
+      e.target.classList.remove('dragging');
+      
+      // Remove drag-over class from all cards
+      document.querySelectorAll('.player-card').forEach(card => {
+        card.classList.remove('drag-over');
+      });
+      
+      draggedElement = null;
+      draggedPlayerId = null;
+      draggedContainer = null;
+    }
+
+    async function swapPlayers(playerId1, playerId2, container1, container2) {
+      showLoading('Updating roster...');
+      
+      try {
+        // Get current roster
+        const { starters, bench } = await teamManager.getTeamRoster(teamId);
+        
+        let starterIds = starters.map(p => p.playerId);
+        let benchIds = bench.map(p => p.playerId);
+        
+        // Find current positions
+        const idx1Starters = starterIds.indexOf(playerId1);
+        const idx1Bench = benchIds.indexOf(playerId1);
+        const idx2Starters = starterIds.indexOf(playerId2);
+        const idx2Bench = benchIds.indexOf(playerId2);
+        
+        if (container1 === container2) {
+          // Same container - reorder within same list
+          if (container1 === 'startersContainer') {
+            // Reorder starters
+            starterIds.splice(idx1Starters, 1);
+            const newIdx2 = starterIds.indexOf(playerId2);
+            starterIds.splice(newIdx2, 0, playerId1);
+          } else {
+            // Reorder bench
+            benchIds.splice(idx1Bench, 1);
+            const newIdx2 = benchIds.indexOf(playerId2);
+            benchIds.splice(newIdx2, 0, playerId1);
+          }
+        } else {
+          // Different containers - swap between starters and bench
+          if (container1 === 'startersContainer') {
+            // Player 1 from starters to bench, Player 2 from bench to starters
+            starterIds.splice(idx1Starters, 1, playerId2);
+            benchIds.splice(idx2Bench, 1, playerId1);
+          } else {
+            // Player 1 from bench to starters, Player 2 from starters to bench
+            benchIds.splice(idx1Bench, 1, playerId2);
+            starterIds.splice(idx2Starters, 1, playerId1);
+          }
+        }
+        
+        // Update roster in database
+        await teamManager.updateRoster(teamId, starterIds, benchIds);
+        
+        hideLoading();
+        showToast('Roster updated!', 'success');
+        
+        // Reload roster
+        await loadTeamRoster();
+      } catch (error) {
+        hideLoading();
+        console.error('Swap players error:', error);
+        showToast('Failed to update roster', 'error');
+      }
     }
 
     function addPlayer() {
