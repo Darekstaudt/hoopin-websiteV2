@@ -401,6 +401,7 @@
         stats,
         capBreakers,
         playerPhoto: playerPhotoBase64,
+        isBody: document.getElementById('isBody').value === 'true',
         teamId
       });
 
@@ -560,8 +561,17 @@
             document.getElementById('photoPreview').classList.add('show');
           }
           
+          // Restore body toggle from draft
+          if (draft.isBody !== undefined) {
+            setBodyValue(draft.isBody);
+          } else {
+            setBodyValue(false);
+          }
+          
           updateCalculation();
         } else {
+          // Initialize toggle to "No" for new players
+          setBodyValue(false);
           updateCalculation();
         }
       }
