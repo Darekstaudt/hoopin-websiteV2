@@ -98,6 +98,7 @@
     const CARD_CENTER_OFFSET_X = 110; // pixels
     const CARD_CENTER_OFFSET_Y = 150; // pixels
     const DRAGGING_CARD_WIDTH = '220px';
+    const DRAG_CLICK_DELAY = 300; // milliseconds to prevent click after drag
 
     async function loadTeamRoster() {
       if (!teamId) return;
@@ -288,7 +289,7 @@
       // Set flag to prevent click
       if (draggedElement) {
         dragHappened = true;
-        setTimeout(() => { dragHappened = false; }, 300);
+        setTimeout(() => { dragHappened = false; }, DRAG_CLICK_DELAY);
       }
       
       draggedElement = null;
@@ -400,7 +401,7 @@
         
         // Set flag to prevent click
         dragHappened = true;
-        setTimeout(() => { dragHappened = false; }, 300);
+        setTimeout(() => { dragHappened = false; }, DRAG_CLICK_DELAY);
       }
       
       touchDragging = false;
