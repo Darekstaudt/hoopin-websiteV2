@@ -319,22 +319,27 @@
     }
 
     function setBodyValue(value) {
-      document.getElementById('isBody').value = value;
+      // Convert boolean to string explicitly
+      document.getElementById('isBody').value = String(value);
       
       // Update button styles
       const noBtn = document.getElementById('bodyNo');
       const yesBtn = document.getElementById('bodyYes');
       
-      if (value === true) {
+      if (value === true || value === 'true') {
         yesBtn.style.background = 'var(--accent-primary)';
         yesBtn.style.borderColor = 'var(--accent-primary)';
+        yesBtn.classList.add('active');
         noBtn.style.background = 'transparent';
         noBtn.style.borderColor = 'var(--text-secondary)';
+        noBtn.classList.remove('active');
       } else {
         noBtn.style.background = 'var(--accent-primary)';
         noBtn.style.borderColor = 'var(--accent-primary)';
+        noBtn.classList.add('active');
         yesBtn.style.background = 'transparent';
         yesBtn.style.borderColor = 'var(--text-secondary)';
+        yesBtn.classList.remove('active');
       }
     }
 

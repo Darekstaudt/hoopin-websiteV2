@@ -584,3 +584,23 @@
   font-size: 1.2rem;
   z-index: 1;
 }
+
+/* ===== Drag and Drop Styles ===== */
+.player-card[draggable="true"] {
+  cursor: grab;
+}
+
+.player-card.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.player-card.drag-over {
+  border: 3px dashed var(--accent-primary);
+  background: rgba(0, 188, 212, 0.1);
+  transform: scale(1.02);
+}
+
+.player-card:active {
+  cursor: grabbing;
+}
