@@ -12,6 +12,27 @@
   <link rel="stylesheet" href="css/cards.css">
   <link rel="stylesheet" href="css/animations.css">
   
+  <style>
+    .player-detail-container {
+      max-width: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 1rem;
+    }
+    
+    .player-detail-card {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    @media (max-width: 768px) {
+      .player-detail-container {
+        padding: 0.5rem;
+      }
+    }
+  </style>
+  
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
@@ -24,8 +45,8 @@
     </div>
   </header>
 
-  <div class="container page-transition">
-    <div class="player-card-detailed" id="playerCard"></div>
+  <div class="container page-transition player-detail-container">
+    <div class="player-card-detailed player-detail-card" id="playerCard"></div>
   </div>
 
   <script src="js/firebase-config.js"></script>

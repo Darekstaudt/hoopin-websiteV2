@@ -90,6 +90,7 @@
     let touchStartY = 0;
     let touchElement = null;
     let longPressTimer = null;
+    let dragHappened = false; // Track if drag occurred to prevent click
     
     // Touch drag constants
     const LONG_PRESS_DURATION = 300; // milliseconds
@@ -174,51 +175,49 @@
         card.addEventListener('touchend', handleTouchEnd);
         card.addEventListener('touchcancel', handleTouchEnd);
         
-        // Click handler for viewing details
+        // Click handler for viewing details - only if NO drag happened
         card.addEventListener('click', (e) => {
+          if (dragHappened) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragHappened = false; // Reset flag
+            return;
+          }
+          
           if (!draggedElement && !touchDragging) {
             viewPlayer(player.playerId);
           }
         });
         
-        // Build stats list
-        const stats = player.stats || {};
-        const capBreakers = player.capBreakers || {};
-        
-        const statsHTML = `
-          <div class="stat-row"><span class="stat-label">Face:</span><span class="stat-value">${stats.face || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">Eyes:</span><span class="stat-value">${stats.eyes || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">Hair:</span><span class="stat-value">${stats.hair || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">Top:</span><span class="stat-value">${stats.top || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">Bottom:</span><span class="stat-value">${stats.bottom || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">Fitness:</span><span class="stat-value">${stats.fitness || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">History:</span><span class="stat-value">${stats.history || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">Personal:</span><span class="stat-value">${stats.personality || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">Tolerance:</span><span class="stat-value">${stats.tolerance || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">Substances:</span><span class="stat-value">${stats.substances || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">+Athletic:</span><span class="stat-value">${capBreakers.athletic || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">+Height:</span><span class="stat-value">${capBreakers.height || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">+Attract:</span><span class="stat-value">${capBreakers.attractiveness || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">+IntoYou:</span><span class="stat-value">${capBreakers.intoYou || 0}</span></div>
-          <div class="stat-row"><span class="stat-label">+Comfort:</span><span class="stat-value">${capBreakers.comfort || 0}</span></div>
-        `;
-        
         card.innerHTML = `
-          <div class="player-card-overall">${player.overall}</div>
-          ${player.isBody ? '<div class="body-badge">💪</div>' : ''}
-          
-          <div class="player-card-photo-left">
-            ${player.playerPhoto 
-              ? `<img src="${player.playerPhoto}" alt="${player.playerName}">`
-              : '👤'
-            }
+          <div class="player-card-header">
+            <div class="player-card-overall-badge">
+              <div class="overall-number">${player.overall}</div>
+              <div class="overall-tier">${player.tier.substring(0, 3).toUpperCase()}</div>
+            </div>
           </div>
-          
-          <div class="player-card-stats-list">
-            ${statsHTML}
+          <div class="player-card-body">
+            <div class="player-card-left">
+              <div class="player-stats-compact">
+                <div class="stat-line-compact">Face: ${Math.round((player.stats.face / 100) * 15)}</div>
+                <div class="stat-line-compact">Top: ${Math.round((player.stats.top / 100) * 5)}</div>
+                <div class="stat-line-compact">Bottom: ${Math.round((player.stats.bottom / 100) * 5)}</div>
+                <div class="stat-line-compact">Fitness: ${Math.round((player.stats.fitness / 100) * 15)}</div>
+                <div class="stat-line-compact">Person: ${Math.round((player.stats.personality / 100) * 20)}</div>
+              </div>
+            </div>
+            <div class="player-card-right">
+              <div class="player-photo-large">
+                ${player.playerPhoto 
+                  ? `<img src="${player.playerPhoto}" alt="${player.playerName}">`
+                  : '<div class="player-icon-large">👤</div>'
+                }
+              </div>
+            </div>
           </div>
-          
-          <div class="player-card-name-bottom">${sanitizeHTML(player.playerName)}</div>
+          <div class="player-card-footer">
+            <div class="player-name-bar">${sanitizeHTML(player.playerName)}</div>
+          </div>
         `;
         
         container.appendChild(card);
@@ -285,6 +284,12 @@
       document.querySelectorAll('.player-card').forEach(card => {
         card.classList.remove('drag-over');
       });
+      
+      // Set flag to prevent click
+      if (draggedElement) {
+        dragHappened = true;
+        setTimeout(() => { dragHappened = false; }, 300);
+      }
       
       draggedElement = null;
       draggedPlayerId = null;
@@ -392,6 +397,10 @@
         const targetPlayerId = targetCard.dataset.playerId;
         const targetContainer = targetCard.dataset.container;
         swapPlayers(draggedPlayerId, targetPlayerId, draggedContainer, targetContainer);
+        
+        // Set flag to prevent click
+        dragHappened = true;
+        setTimeout(() => { dragHappened = false; }, 300);
       }
       
       touchDragging = false;
