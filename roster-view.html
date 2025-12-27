@@ -293,26 +293,32 @@
         if (container1 === container2) {
           // Same container - reorder within same list
           if (container1 === 'startersContainer') {
-            // Reorder starters
+            // Reorder starters - calculate target index before any modifications
+            const targetIdx = idx2Starters > idx1Starters ? idx2Starters - 1 : idx2Starters;
             starterIds.splice(idx1Starters, 1);
-            const newIdx2 = starterIds.indexOf(playerId2);
-            starterIds.splice(newIdx2, 0, playerId1);
+            starterIds.splice(targetIdx, 0, playerId1);
           } else {
-            // Reorder bench
+            // Reorder bench - calculate target index before any modifications
+            const targetIdx = idx2Bench > idx1Bench ? idx2Bench - 1 : idx2Bench;
             benchIds.splice(idx1Bench, 1);
-            const newIdx2 = benchIds.indexOf(playerId2);
-            benchIds.splice(newIdx2, 0, playerId1);
+            benchIds.splice(targetIdx, 0, playerId1);
           }
         } else {
           // Different containers - swap between starters and bench
           if (container1 === 'startersContainer') {
             // Player 1 from starters to bench, Player 2 from bench to starters
-            starterIds.splice(idx1Starters, 1, playerId2);
-            benchIds.splice(idx2Bench, 1, playerId1);
+            // Use separate remove and insert operations for safety
+            starterIds.splice(idx1Starters, 1);
+            benchIds.splice(idx2Bench, 1);
+            starterIds.splice(idx1Starters, 0, playerId2);
+            benchIds.splice(idx2Bench, 0, playerId1);
           } else {
             // Player 1 from bench to starters, Player 2 from starters to bench
-            benchIds.splice(idx1Bench, 1, playerId2);
-            starterIds.splice(idx2Starters, 1, playerId1);
+            // Use separate remove and insert operations for safety
+            benchIds.splice(idx1Bench, 1);
+            starterIds.splice(idx2Starters, 1);
+            benchIds.splice(idx1Bench, 0, playerId2);
+            starterIds.splice(idx2Starters, 0, playerId1);
           }
         }
         
