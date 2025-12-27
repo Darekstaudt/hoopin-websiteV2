@@ -78,139 +78,169 @@
           <div class="range-group">
             <div class="range-label">
               <label>Face</label>
-              <span class="range-value" id="faceValue">0</span>
             </div>
-            <input type="range" id="face" min="0" max="15" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-15 points</span>
+            <input type="range" id="face" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="faceSlider">0/100</span>
+              <span class="weighted-value" id="faceWeighted">→ 0.00/15</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Eyes</label>
-              <span class="range-value" id="eyesValue">0</span>
             </div>
-            <input type="range" id="eyes" min="0" max="5" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-5 points</span>
+            <input type="range" id="eyes" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="eyesSlider">0/100</span>
+              <span class="weighted-value" id="eyesWeighted">→ 0.00/5</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Hair</label>
-              <span class="range-value" id="hairValue">0</span>
             </div>
-            <input type="range" id="hair" min="0" max="5" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-5 points</span>
+            <input type="range" id="hair" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="hairSlider">0/100</span>
+              <span class="weighted-value" id="hairWeighted">→ 0.00/5</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Top</label>
-              <span class="range-value" id="topValue">0</span>
             </div>
-            <input type="range" id="top" min="0" max="5" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-5 points</span>
+            <input type="range" id="top" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="topSlider">0/100</span>
+              <span class="weighted-value" id="topWeighted">→ 0.00/5</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Bottom</label>
-              <span class="range-value" id="bottomValue">0</span>
             </div>
-            <input type="range" id="bottom" min="0" max="5" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-5 points</span>
+            <input type="range" id="bottom" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="bottomSlider">0/100</span>
+              <span class="weighted-value" id="bottomWeighted">→ 0.00/5</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Fitness</label>
-              <span class="range-value" id="fitnessValue">0</span>
             </div>
-            <input type="range" id="fitness" min="0" max="15" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-15 points</span>
+            <input type="range" id="fitness" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="fitnessSlider">0/100</span>
+              <span class="weighted-value" id="fitnessWeighted">→ 0.00/15</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>History</label>
-              <span class="range-value" id="historyValue">0</span>
             </div>
-            <input type="range" id="history" min="0" max="10" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-10 points</span>
+            <input type="range" id="history" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="historySlider">0/100</span>
+              <span class="weighted-value" id="historyWeighted">→ 0.00/10</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Personality</label>
-              <span class="range-value" id="personalityValue">0</span>
             </div>
-            <input type="range" id="personality" min="0" max="20" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-20 points</span>
+            <input type="range" id="personality" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="personalitySlider">0/100</span>
+              <span class="weighted-value" id="personalityWeighted">→ 0.00/20</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Tolerance</label>
-              <span class="range-value" id="toleranceValue">0</span>
             </div>
-            <input type="range" id="tolerance" min="0" max="10" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-10 points</span>
+            <input type="range" id="tolerance" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="toleranceSlider">0/100</span>
+              <span class="weighted-value" id="toleranceWeighted">→ 0.00/10</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Substances</label>
-              <span class="range-value" id="substancesValue">0</span>
             </div>
-            <input type="range" id="substances" min="0" max="10" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-10 points</span>
+            <input type="range" id="substances" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="substancesSlider">0/100</span>
+              <span class="weighted-value" id="substancesWeighted">→ 0.00/10</span>
+            </div>
           </div>
 
           <!-- Cap Breakers -->
-          <h3 style="margin-top: 2rem;">Cap Breakers (0-8 bonus)</h3>
+          <h3 style="margin-top: 2rem;">Cap Breakers (0-9 bonus)</h3>
 
           <div class="range-group">
             <div class="range-label">
               <label>Athletic/Build</label>
-              <span class="range-value" id="athleticValue">0</span>
             </div>
-            <input type="range" id="athletic" min="0" max="2" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-2 points</span>
+            <input type="range" id="athletic" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="athleticSlider">0/100</span>
+              <span class="weighted-value" id="athleticWeighted">→ 0.00/2</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Height</label>
-              <span class="range-value" id="heightValue">0</span>
             </div>
-            <input type="range" id="height" min="0" max="1" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-1 points</span>
+            <input type="range" id="height" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="heightSlider">0/100</span>
+              <span class="weighted-value" id="heightWeighted">→ 0.00/1</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Attractiveness</label>
-              <span class="range-value" id="attractivenessValue">0</span>
             </div>
-            <input type="range" id="attractiveness" min="0" max="2" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-2 points</span>
+            <input type="range" id="attractiveness" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="attractivenessSlider">0/100</span>
+              <span class="weighted-value" id="attractivenessWeighted">→ 0.00/2</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Into You</label>
-              <span class="range-value" id="intoYouValue">0</span>
             </div>
-            <input type="range" id="intoYou" min="0" max="1" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-1 points</span>
+            <input type="range" id="intoYou" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="intoYouSlider">0/100</span>
+              <span class="weighted-value" id="intoYouWeighted">→ 0.00/1</span>
+            </div>
           </div>
 
           <div class="range-group">
             <div class="range-label">
               <label>Comfort</label>
-              <span class="range-value" id="comfortValue">0</span>
             </div>
-            <input type="range" id="comfort" min="0" max="2" value="0" oninput="updateCalculation()">
-            <span class="help-text">0-2 points</span>
+            <input type="range" id="comfort" min="0" max="100" value="0" oninput="updateCalculation()">
+            <div class="stat-display">
+              <span class="slider-value" id="comfortSlider">0/100</span>
+              <span class="weighted-value" id="comfortWeighted">→ 0.00/3</span>
+            </div>
           </div>
 
           <!-- Actions -->
@@ -242,35 +272,49 @@
     let isEditing = false;
     let editingPlayerId = null;
 
+    // Convert old weighted values to 0-100 slider values
+    // Strategy: If value is suspiciously low for a 0-100 scale (< 50), 
+    // AND is within the old weighted range, we convert it.
+    // This isn't perfect but handles most real-world cases.
+    function convertOldToNewScale(oldValue, maxWeight) {
+      // If value is clearly in 0-100 range (> maxWeight * 2), return as is
+      if (oldValue > maxWeight * 2) {
+        return oldValue;
+      }
+      // If value is within weighted range and suspiciously low, convert it
+      if (oldValue <= maxWeight) {
+        return Math.round((oldValue / maxWeight) * 100);
+      }
+      // Otherwise return as is (assume it's already 0-100)
+      return oldValue;
+    }
+
     function updateCalculation() {
-      const stats = {
-        face: parseInt(document.getElementById('face').value),
-        eyes: parseInt(document.getElementById('eyes').value),
-        hair: parseInt(document.getElementById('hair').value),
-        top: parseInt(document.getElementById('top').value),
-        bottom: parseInt(document.getElementById('bottom').value),
-        fitness: parseInt(document.getElementById('fitness').value),
-        history: parseInt(document.getElementById('history').value),
-        personality: parseInt(document.getElementById('personality').value),
-        tolerance: parseInt(document.getElementById('tolerance').value),
-        substances: parseInt(document.getElementById('substances').value)
-      };
+      const baseWeights = ratingsCalculator.getBaseWeights();
+      const capWeights = ratingsCalculator.getCapBreakerWeights();
+      
+      // Get slider values (all 0-100) and update displays
+      const stats = {};
+      for (const stat in baseWeights) {
+        const sliderValue = parseInt(document.getElementById(stat).value);
+        stats[stat] = sliderValue;
+        
+        // Update display with both slider value and weighted value
+        const weighted = ratingsCalculator.convertToWeighted(sliderValue, baseWeights[stat]);
+        document.getElementById(`${stat}Slider`).textContent = `${sliderValue}/100`;
+        document.getElementById(`${stat}Weighted`).textContent = `→ ${weighted.toFixed(2)}/${baseWeights[stat]}`;
+      }
 
-      const capBreakers = {
-        athletic: parseInt(document.getElementById('athletic').value),
-        height: parseInt(document.getElementById('height').value),
-        attractiveness: parseInt(document.getElementById('attractiveness').value),
-        intoYou: parseInt(document.getElementById('intoYou').value),
-        comfort: parseInt(document.getElementById('comfort').value)
-      };
-
-      // Update display values
-      Object.keys(stats).forEach(key => {
-        document.getElementById(`${key}Value`).textContent = stats[key];
-      });
-      Object.keys(capBreakers).forEach(key => {
-        document.getElementById(`${key}Value`).textContent = capBreakers[key];
-      });
+      const capBreakers = {};
+      for (const stat in capWeights) {
+        const sliderValue = parseInt(document.getElementById(stat).value);
+        capBreakers[stat] = sliderValue;
+        
+        // Update display with both slider value and weighted value
+        const weighted = ratingsCalculator.convertToWeighted(sliderValue, capWeights[stat]);
+        document.getElementById(`${stat}Slider`).textContent = `${sliderValue}/100`;
+        document.getElementById(`${stat}Weighted`).textContent = `→ ${weighted.toFixed(2)}/${capWeights[stat]}`;
+      }
 
       const ratings = ratingsCalculator.calculatePlayerRatings(stats, capBreakers);
       
@@ -290,26 +334,18 @@
     }
 
     const autosaveDraft = debounce(() => {
-      const stats = {
-        face: parseInt(document.getElementById('face').value),
-        eyes: parseInt(document.getElementById('eyes').value),
-        hair: parseInt(document.getElementById('hair').value),
-        top: parseInt(document.getElementById('top').value),
-        bottom: parseInt(document.getElementById('bottom').value),
-        fitness: parseInt(document.getElementById('fitness').value),
-        history: parseInt(document.getElementById('history').value),
-        personality: parseInt(document.getElementById('personality').value),
-        tolerance: parseInt(document.getElementById('tolerance').value),
-        substances: parseInt(document.getElementById('substances').value)
-      };
+      const baseWeights = ratingsCalculator.getBaseWeights();
+      const capWeights = ratingsCalculator.getCapBreakerWeights();
+      
+      const stats = {};
+      for (const stat in baseWeights) {
+        stats[stat] = parseInt(document.getElementById(stat).value);
+      }
 
-      const capBreakers = {
-        athletic: parseInt(document.getElementById('athletic').value),
-        height: parseInt(document.getElementById('height').value),
-        attractiveness: parseInt(document.getElementById('attractiveness').value),
-        intoYou: parseInt(document.getElementById('intoYou').value),
-        comfort: parseInt(document.getElementById('comfort').value)
-      };
+      const capBreakers = {};
+      for (const stat in capWeights) {
+        capBreakers[stat] = parseInt(document.getElementById(stat).value);
+      }
 
       session.set('playerDraft', {
         playerName: document.getElementById('playerName').value,
@@ -345,29 +381,25 @@
       showLoading(isEditing ? 'Updating player...' : 'Adding player...');
 
       try {
+        const baseWeights = ratingsCalculator.getBaseWeights();
+        const capWeights = ratingsCalculator.getCapBreakerWeights();
+        
+        const stats = {};
+        for (const stat in baseWeights) {
+          stats[stat] = parseInt(document.getElementById(stat).value);
+        }
+
+        const capBreakers = {};
+        for (const stat in capWeights) {
+          capBreakers[stat] = parseInt(document.getElementById(stat).value);
+        }
+
         const playerData = {
           playerName: document.getElementById('playerName').value,
           playerPhoto: playerPhotoBase64,
           teamId,
-          stats: {
-            face: parseInt(document.getElementById('face').value),
-            eyes: parseInt(document.getElementById('eyes').value),
-            hair: parseInt(document.getElementById('hair').value),
-            top: parseInt(document.getElementById('top').value),
-            bottom: parseInt(document.getElementById('bottom').value),
-            fitness: parseInt(document.getElementById('fitness').value),
-            history: parseInt(document.getElementById('history').value),
-            personality: parseInt(document.getElementById('personality').value),
-            tolerance: parseInt(document.getElementById('tolerance').value),
-            substances: parseInt(document.getElementById('substances').value)
-          },
-          capBreakers: {
-            athletic: parseInt(document.getElementById('athletic').value),
-            height: parseInt(document.getElementById('height').value),
-            attractiveness: parseInt(document.getElementById('attractiveness').value),
-            intoYou: parseInt(document.getElementById('intoYou').value),
-            comfort: parseInt(document.getElementById('comfort').value)
-          }
+          stats,
+          capBreakers
         };
 
         let result;
@@ -423,11 +455,23 @@
         if (player) {
           document.getElementById('playerName').value = player.playerName;
           
+          const baseWeights = ratingsCalculator.getBaseWeights();
+          const capWeights = ratingsCalculator.getCapBreakerWeights();
+          
+          // Convert old scale values to new 0-100 scale for base stats
           Object.keys(player.stats).forEach(key => {
-            document.getElementById(key).value = player.stats[key];
+            const oldValue = player.stats[key];
+            const maxWeight = baseWeights[key];
+            const newValue = convertOldToNewScale(oldValue, maxWeight);
+            document.getElementById(key).value = newValue;
           });
+          
+          // Convert old scale values to new 0-100 scale for cap breakers
           Object.keys(player.capBreakers).forEach(key => {
-            document.getElementById(key).value = player.capBreakers[key];
+            const oldValue = player.capBreakers[key];
+            const maxWeight = capWeights[key];
+            const newValue = convertOldToNewScale(oldValue, maxWeight);
+            document.getElementById(key).value = newValue;
           });
           
           if (player.playerPhoto) {

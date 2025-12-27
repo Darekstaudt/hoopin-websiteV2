@@ -1,16 +1,18 @@
 /**
  * NBA 2K-Style Rating Calculation Engine
  * 
- * Base Stats (0-100 total):
- * - Face (0-15), Eyes (0-5), Hair (0-5), Top (0-5), Bottom (0-5)
- * - Fitness (0-15), History (0-10), Personality (0-20)
- * - Tolerance (0-10), Substances (0-10)
+ * All slider inputs are 0-100, converted to weighted points.
  * 
- * Cap Breakers (0-8 bonus):
- * - Athletic/Build (0-2), Height (0-1), Attractiveness (0-2)
- * - Into You (0-1), Comfort (0-2)
+ * Base Stats (0-100 total weighted):
+ * - Face (weight: 15), Eyes (weight: 5), Hair (weight: 5), Top (weight: 5), Bottom (weight: 5)
+ * - Fitness (weight: 15), History (weight: 10), Personality (weight: 20)
+ * - Tolerance (weight: 10), Substances (weight: 10)
  * 
- * Overall = Base Total + Cap Breaker Total (Max 108)
+ * Cap Breakers (0-9 bonus weighted):
+ * - Athletic/Build (weight: 2), Height (weight: 1), Attractiveness (weight: 2)
+ * - Into You (weight: 1), Comfort (weight: 3)
+ * 
+ * Overall = Base Total + Cap Breaker Total (Max 109)
  */
 
 // Tier thresholds and styling
@@ -18,7 +20,7 @@ const TIER_THRESHOLDS = [
   { 
     name: 'Dark Matter', 
     min: 99, 
-    max: 108,
+    max: 109,
     class: 'tier-dark-matter', 
     rarity: 'Legendary', 
     color: '#ff00ff',
@@ -136,24 +138,67 @@ const CAP_BREAKERS = {
   height: { min: 0, max: 1, label: 'Height' },
   attractiveness: { min: 0, max: 2, label: 'Attractiveness' },
   intoYou: { min: 0, max: 1, label: 'Into You' },
-  comfort: { min: 0, max: 2, label: 'Comfort' }
+  comfort: { min: 0, max: 3, label: 'Comfort' }
 };
 
 const MAX_BASE_TOTAL = 100;
-const MAX_CAP_BREAKER_TOTAL = 8;
-const MAX_OVERALL = 108;
+const MAX_CAP_BREAKER_TOTAL = 9;
+const MAX_OVERALL = 109;
 
 class RatingsCalculator {
   /**
+   * Get base stat weight mappings
+   */
+  getBaseWeights() {
+    return {
+      face: 15,
+      eyes: 5,
+      hair: 5,
+      top: 5,
+      bottom: 5,
+      fitness: 15,
+      history: 10,
+      personality: 20,
+      tolerance: 10,
+      substances: 10
+    };
+  }
+
+  /**
+   * Get cap breaker weight mappings
+   */
+  getCapBreakerWeights() {
+    return {
+      athletic: 2,
+      height: 1,
+      attractiveness: 2,
+      intoYou: 1,
+      comfort: 3
+    };
+  }
+
+  /**
+   * Convert 0-100 slider value to weighted points
+   */
+  convertToWeighted(sliderValue, maxWeight) {
+    return (sliderValue / 100) * maxWeight;
+  }
+
+  /**
    * Calculate base stats total
+   * Now expects stats values to be 0-100 and converts to weighted points
    */
   calculateBaseTotal(stats) {
     if (!stats) return 0;
     
+    const baseWeights = this.getBaseWeights();
     let total = 0;
-    for (const [key, limits] of Object.entries(BASE_STATS)) {
-      const value = parseInt(stats[key]) || 0;
-      total += Math.max(limits.min, Math.min(limits.max, value));
+    
+    for (const [key, weight] of Object.entries(baseWeights)) {
+      const sliderValue = parseInt(stats[key]) || 0;
+      // Convert 0-100 slider value to weighted points
+      const weighted = this.convertToWeighted(sliderValue, weight);
+      total += weighted;
     }
     
     return Math.min(total, MAX_BASE_TOTAL);
@@ -161,14 +206,19 @@ class RatingsCalculator {
 
   /**
    * Calculate cap breakers total
+   * Now expects cap breaker values to be 0-100 and converts to weighted points
    */
   calculateCapBreakerTotal(capBreakers) {
     if (!capBreakers) return 0;
     
+    const capWeights = this.getCapBreakerWeights();
     let total = 0;
-    for (const [key, limits] of Object.entries(CAP_BREAKERS)) {
-      const value = parseInt(capBreakers[key]) || 0;
-      total += Math.max(limits.min, Math.min(limits.max, value));
+    
+    for (const [key, weight] of Object.entries(capWeights)) {
+      const sliderValue = parseInt(capBreakers[key]) || 0;
+      // Convert 0-100 slider value to weighted points
+      const weighted = this.convertToWeighted(sliderValue, weight);
+      total += weighted;
     }
     
     return Math.min(total, MAX_CAP_BREAKER_TOTAL);
@@ -203,12 +253,12 @@ class RatingsCalculator {
   calculatePlayerRatings(stats, capBreakers) {
     const baseTotal = this.calculateBaseTotal(stats);
     const capBreakerTotal = this.calculateCapBreakerTotal(capBreakers);
-    const overall = baseTotal + capBreakerTotal;
+    const overall = Math.min(Math.round(baseTotal + capBreakerTotal), MAX_OVERALL); // Ensure it doesn't exceed max
     const tier = this.getTier(overall);
 
     return {
-      baseTotal,
-      capBreakerTotal,
+      baseTotal: Math.round(baseTotal * 10) / 10, // Round to 1 decimal place
+      capBreakerTotal: Math.round(capBreakerTotal * 10) / 10, // Round to 1 decimal place
       overall,
       tier: tier.name,
       tierClass: tier.class,
@@ -219,12 +269,12 @@ class RatingsCalculator {
   }
 
   /**
-   * Validate stat value
+   * Validate stat value (now expects 0-100 slider values)
    */
   validateStat(statKey, value, isCapBreaker = false) {
-    const limits = isCapBreaker ? CAP_BREAKERS[statKey] : BASE_STATS[statKey];
+    const weights = isCapBreaker ? this.getCapBreakerWeights() : this.getBaseWeights();
     
-    if (!limits) {
+    if (!weights[statKey]) {
       throw new Error(`Unknown stat: ${statKey}`);
     }
 
@@ -234,10 +284,11 @@ class RatingsCalculator {
       return { valid: false, error: 'Must be a number' };
     }
 
-    if (numValue < limits.min || numValue > limits.max) {
+    // All slider values should be 0-100
+    if (numValue < 0 || numValue > 100) {
       return { 
         valid: false, 
-        error: `Must be between ${limits.min} and ${limits.max}` 
+        error: 'Must be between 0 and 100' 
       };
     }
 
@@ -298,22 +349,26 @@ class RatingsCalculator {
   }
 
   /**
-   * Create stat bars HTML
+   * Create stat bars HTML (now expects 0-100 slider values)
    */
   createStatBars(stats, capBreakers) {
     let html = '<div class="stat-bars">';
     
+    const baseWeights = this.getBaseWeights();
+    const capWeights = this.getCapBreakerWeights();
+    
     // Base stats
     html += '<div class="stat-section"><h4>Base Stats</h4>';
-    for (const [key, limits] of Object.entries(BASE_STATS)) {
-      const value = parseInt(stats[key]) || 0;
-      const percentage = this.getStatPercentage(value, limits.max);
+    for (const [key, weight] of Object.entries(baseWeights)) {
+      const sliderValue = parseInt(stats[key]) || 0; // 0-100
+      const weighted = this.convertToWeighted(sliderValue, weight);
+      const percentage = sliderValue; // Since it's already 0-100
       html += `
         <div class="stat-bar">
-          <label>${limits.label}</label>
+          <label>${BASE_STATS[key]?.label || key}</label>
           <div class="bar-container">
             <div class="bar-fill" style="width: ${percentage}%"></div>
-            <span class="bar-value">${value}/${limits.max}</span>
+            <span class="bar-value">${sliderValue}/100 → ${weighted.toFixed(2)}/${weight}</span>
           </div>
         </div>
       `;
@@ -322,15 +377,16 @@ class RatingsCalculator {
 
     // Cap breakers
     html += '<div class="stat-section"><h4>Cap Breakers</h4>';
-    for (const [key, limits] of Object.entries(CAP_BREAKERS)) {
-      const value = parseInt(capBreakers[key]) || 0;
-      const percentage = this.getStatPercentage(value, limits.max);
+    for (const [key, weight] of Object.entries(capWeights)) {
+      const sliderValue = parseInt(capBreakers[key]) || 0; // 0-100
+      const weighted = this.convertToWeighted(sliderValue, weight);
+      const percentage = sliderValue; // Since it's already 0-100
       html += `
         <div class="stat-bar">
-          <label>${limits.label}</label>
+          <label>${CAP_BREAKERS[key]?.label || key}</label>
           <div class="bar-container">
             <div class="bar-fill cap-breaker" style="width: ${percentage}%"></div>
-            <span class="bar-value">${value}/${limits.max}</span>
+            <span class="bar-value">${sliderValue}/100 → ${weighted.toFixed(2)}/${weight}</span>
           </div>
         </div>
       `;
