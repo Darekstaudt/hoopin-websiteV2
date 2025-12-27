@@ -180,7 +180,7 @@
   position: relative;
 }
 
-.player-card.tier-pink-diamond::before {
+.player-card.tier-pink-diamond::after {
   content: '';
   position: absolute;
   top: 0;
@@ -716,8 +716,4 @@
   border: 3px dashed var(--accent-primary);
   background: rgba(255, 255, 255, 0.1);
   transform: scale(1.02);
-}
-
-.player-card:active {
-  cursor: grabbing;
 }

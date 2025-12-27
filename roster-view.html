@@ -90,6 +90,13 @@
     let touchStartY = 0;
     let touchElement = null;
     let longPressTimer = null;
+    
+    // Touch drag constants
+    const LONG_PRESS_DURATION = 300; // milliseconds
+    const TOUCH_MOVE_THRESHOLD = 10; // pixels
+    const CARD_CENTER_OFFSET_X = 110; // pixels
+    const CARD_CENTER_OFFSET_Y = 150; // pixels
+    const DRAGGING_CARD_WIDTH = '220px';
 
     async function loadTeamRoster() {
       if (!teamId) return;
@@ -291,7 +298,7 @@
       touchStartY = touch.clientY;
       touchElement = e.currentTarget;
       
-      // Long press to start dragging (300ms)
+      // Long press to start dragging
       longPressTimer = setTimeout(() => {
         if (touchElement) {
           touchDragging = true;
@@ -306,7 +313,7 @@
             navigator.vibrate(50);
           }
         }
-      }, 300);
+      }, LONG_PRESS_DURATION);
     }
 
     function handleTouchMove(e) {
@@ -315,7 +322,7 @@
         const touch = e.touches[0];
         const deltaX = Math.abs(touch.clientX - touchStartX);
         const deltaY = Math.abs(touch.clientY - touchStartY);
-        if (deltaX > 10 || deltaY > 10) {
+        if (deltaX > TOUCH_MOVE_THRESHOLD || deltaY > TOUCH_MOVE_THRESHOLD) {
           clearTimeout(longPressTimer);
         }
         return;
@@ -330,11 +337,11 @@
       // Move the card with finger
       if (touchElement) {
         touchElement.style.position = 'fixed';
-        touchElement.style.left = `${currentX - 110}px`; // Center under finger
-        touchElement.style.top = `${currentY - 150}px`;
+        touchElement.style.left = `${currentX - CARD_CENTER_OFFSET_X}px`;
+        touchElement.style.top = `${currentY - CARD_CENTER_OFFSET_Y}px`;
         touchElement.style.zIndex = '1000';
         touchElement.style.pointerEvents = 'none';
-        touchElement.style.width = '220px';
+        touchElement.style.width = DRAGGING_CARD_WIDTH;
       }
       
       // Find card under touch point
