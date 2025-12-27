@@ -194,17 +194,17 @@
           <div class="player-card-header">
             <div class="player-card-overall-badge">
               <div class="overall-number">${player.overall}</div>
-              <div class="overall-tier">${player.tier.substring(0, 3).toUpperCase()}</div>
+              <div class="overall-tier">${(player.tier || '').substring(0, 3).toUpperCase()}</div>
             </div>
           </div>
           <div class="player-card-body">
             <div class="player-card-left">
               <div class="player-stats-compact">
-                <div class="stat-line-compact">Face: ${Math.round((player.stats.face / 100) * 15)}</div>
-                <div class="stat-line-compact">Top: ${Math.round((player.stats.top / 100) * 5)}</div>
-                <div class="stat-line-compact">Bottom: ${Math.round((player.stats.bottom / 100) * 5)}</div>
-                <div class="stat-line-compact">Fitness: ${Math.round((player.stats.fitness / 100) * 15)}</div>
-                <div class="stat-line-compact">Person: ${Math.round((player.stats.personality / 100) * 20)}</div>
+                <div class="stat-line-compact">Face: ${Math.round(((player.stats?.face || 0) / 100) * 15)}</div>
+                <div class="stat-line-compact">Top: ${Math.round(((player.stats?.top || 0) / 100) * 5)}</div>
+                <div class="stat-line-compact">Bottom: ${Math.round(((player.stats?.bottom || 0) / 100) * 5)}</div>
+                <div class="stat-line-compact">Fitness: ${Math.round(((player.stats?.fitness || 0) / 100) * 15)}</div>
+                <div class="stat-line-compact">Person: ${Math.round(((player.stats?.personality || 0) / 100) * 20)}</div>
               </div>
             </div>
             <div class="player-card-right">
