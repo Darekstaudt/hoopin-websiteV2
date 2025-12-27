@@ -82,23 +82,11 @@
   <script>
     let teamId = null;
     let currentTeam = null;
-    let draggedElement = null;
-    let draggedPlayerId = null;
-    let draggedContainer = null;
-    let touchDragging = false;
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchElement = null;
-    let longPressTimer = null;
-    let dragHappened = false; // Track if drag occurred to prevent click
     
-    // Touch drag constants
-    const LONG_PRESS_DURATION = 300; // milliseconds
-    const TOUCH_MOVE_THRESHOLD = 10; // pixels
-    const CARD_CENTER_OFFSET_X = 110; // pixels
-    const CARD_CENTER_OFFSET_Y = 150; // pixels
-    const DRAGGING_CARD_WIDTH = '220px';
-    const DRAG_CLICK_DELAY = 300; // milliseconds to prevent click after drag
+    // Swap mode state
+    let swapMode = false;
+    let swapPlayerId = null;
+    let swapPlayerName = null;
 
     async function loadTeamRoster() {
       if (!teamId) return;
@@ -158,53 +146,28 @@
       players.forEach((player, index) => {
         const card = document.createElement('div');
         card.className = `player-card ${player.tierClass} gpu-accelerated`;
-        card.draggable = true;
         card.dataset.playerId = player.playerId;
         card.dataset.container = containerId;
         
-        // Desktop drag events
-        card.addEventListener('dragstart', handleDragStart);
-        card.addEventListener('dragover', handleDragOver);
-        card.addEventListener('drop', handleDrop);
-        card.addEventListener('dragend', handleDragEnd);
-        card.addEventListener('dragenter', handleDragEnter);
-        card.addEventListener('dragleave', handleDragLeave);
-        
-        // Mobile touch events
-        card.addEventListener('touchstart', handleTouchStart, { passive: false });
-        card.addEventListener('touchmove', handleTouchMove, { passive: false });
-        card.addEventListener('touchend', handleTouchEnd);
-        card.addEventListener('touchcancel', handleTouchEnd);
-        
-        // Click handler for viewing details - only if NO drag happened
-        card.addEventListener('click', (e) => {
-          if (dragHappened) {
-            e.preventDefault();
-            e.stopPropagation();
-            dragHappened = false; // Reset flag
-            return;
-          }
-          
-          if (!draggedElement && !touchDragging) {
-            viewPlayer(player.playerId);
-          }
+        // Click handler for viewing details or swapping
+        card.addEventListener('click', () => {
+          handleCardClick(player.playerId);
         });
         
         card.innerHTML = `
           <div class="player-card-header">
             <div class="player-card-overall-badge">
               <div class="overall-number">${player.overall}</div>
-              <div class="overall-tier">${(player.tier || '').substring(0, 3).toUpperCase()}</div>
             </div>
           </div>
           <div class="player-card-body">
             <div class="player-card-left">
               <div class="player-stats-compact">
-                <div class="stat-line-compact">Face: ${Math.round(((player.stats?.face || 0) / 100) * 15)}</div>
-                <div class="stat-line-compact">Top: ${Math.round(((player.stats?.top || 0) / 100) * 5)}</div>
-                <div class="stat-line-compact">Bottom: ${Math.round(((player.stats?.bottom || 0) / 100) * 5)}</div>
-                <div class="stat-line-compact">Fitness: ${Math.round(((player.stats?.fitness || 0) / 100) * 15)}</div>
-                <div class="stat-line-compact">Person: ${Math.round(((player.stats?.personality || 0) / 100) * 20)}</div>
+                <div class="stat-line-compact"><strong>Face:</strong> ${player.stats?.face || 0}</div>
+                <div class="stat-line-compact"><strong>Top:</strong> ${player.stats?.top || 0}</div>
+                <div class="stat-line-compact"><strong>Bottom:</strong> ${player.stats?.bottom || 0}</div>
+                <div class="stat-line-compact"><strong>Fitness:</strong> ${player.stats?.fitness || 0}</div>
+                <div class="stat-line-compact"><strong>Person:</strong> ${player.stats?.personality || 0}</div>
               </div>
             </div>
             <div class="player-card-right">
@@ -225,251 +188,85 @@
       });
     }
 
-    function handleDragStart(e) {
-      draggedElement = e.target;
-      draggedPlayerId = e.target.dataset.playerId;
-      draggedContainer = e.target.dataset.container;
-      
-      e.target.style.opacity = '0.5';
-      e.target.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/html', e.target.innerHTML);
-    }
-
-    function handleDragOver(e) {
-      if (e.preventDefault) {
-        e.preventDefault();
-      }
-      e.dataTransfer.dropEffect = 'move';
-      return false;
-    }
-
-    function handleDragEnter(e) {
-      if (e.target.classList.contains('player-card')) {
-        e.target.classList.add('drag-over');
-      }
-    }
-
-    function handleDragLeave(e) {
-      if (e.target.classList.contains('player-card')) {
-        e.target.classList.remove('drag-over');
-      }
-    }
-
-    function handleDrop(e) {
-      if (e.stopPropagation) {
-        e.stopPropagation();
-      }
-      
-      const targetCard = e.target.closest('.player-card');
-      if (!targetCard) return false;
-      
-      targetCard.classList.remove('drag-over');
-      
-      if (draggedElement !== targetCard) {
-        const targetPlayerId = targetCard.dataset.playerId;
-        const targetContainer = targetCard.dataset.container;
-        
-        // Perform the swap/move
-        swapPlayers(draggedPlayerId, targetPlayerId, draggedContainer, targetContainer);
-      }
-      
-      return false;
-    }
-
-    function handleDragEnd(e) {
-      e.target.style.opacity = '1';
-      e.target.classList.remove('dragging');
-      
-      // Remove drag-over class from all cards
-      document.querySelectorAll('.player-card').forEach(card => {
-        card.classList.remove('drag-over');
-      });
-      
-      // Set flag to prevent click
-      if (draggedElement) {
-        dragHappened = true;
-        setTimeout(() => { dragHappened = false; }, DRAG_CLICK_DELAY);
-      }
-      
-      draggedElement = null;
-      draggedPlayerId = null;
-      draggedContainer = null;
-    }
-
-    // Touch handlers for mobile drag-and-drop
-    function handleTouchStart(e) {
-      const touch = e.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-      touchElement = e.currentTarget;
-      
-      // Long press to start dragging
-      longPressTimer = setTimeout(() => {
-        if (touchElement) {
-          touchDragging = true;
-          touchElement.style.opacity = '0.5';
-          touchElement.classList.add('dragging');
-          draggedElement = touchElement;
-          draggedPlayerId = touchElement.dataset.playerId;
-          draggedContainer = touchElement.dataset.container;
-          
-          // Haptic feedback if available
-          if (navigator.vibrate) {
-            navigator.vibrate(50);
-          }
+    function handleCardClick(playerId) {
+      if (swapMode && swapPlayerId) {
+        // Execute swap
+        if (playerId !== swapPlayerId) {
+          executeSwap(swapPlayerId, playerId);
+        } else {
+          showToast('Cannot swap player with itself', 'error');
         }
-      }, LONG_PRESS_DURATION);
-    }
-
-    function handleTouchMove(e) {
-      if (!touchDragging) {
-        // Check if moved too much - cancel long press
-        const touch = e.touches[0];
-        const deltaX = Math.abs(touch.clientX - touchStartX);
-        const deltaY = Math.abs(touch.clientY - touchStartY);
-        if (deltaX > TOUCH_MOVE_THRESHOLD || deltaY > TOUCH_MOVE_THRESHOLD) {
-          clearTimeout(longPressTimer);
-        }
-        return;
-      }
-      
-      e.preventDefault(); // Prevent scrolling while dragging
-      
-      const touch = e.touches[0];
-      const currentX = touch.clientX;
-      const currentY = touch.clientY;
-      
-      // Move the card with finger
-      if (touchElement) {
-        touchElement.style.position = 'fixed';
-        touchElement.style.left = `${currentX - CARD_CENTER_OFFSET_X}px`;
-        touchElement.style.top = `${currentY - CARD_CENTER_OFFSET_Y}px`;
-        touchElement.style.zIndex = '1000';
-        touchElement.style.pointerEvents = 'none';
-        touchElement.style.width = DRAGGING_CARD_WIDTH;
-      }
-      
-      // Find card under touch point
-      const elementUnder = document.elementFromPoint(currentX, currentY);
-      const targetCard = elementUnder?.closest('.player-card');
-      
-      // Remove drag-over from all cards
-      document.querySelectorAll('.player-card').forEach(card => {
-        if (card !== touchElement) {
-          card.classList.remove('drag-over');
-        }
-      });
-      
-      // Add drag-over to target
-      if (targetCard && targetCard !== touchElement) {
-        targetCard.classList.add('drag-over');
+      } else {
+        // Normal behavior: view player details
+        viewPlayer(playerId);
       }
     }
 
-    function handleTouchEnd(e) {
-      clearTimeout(longPressTimer);
-      
-      if (!touchDragging) {
-        touchElement = null;
-        return;
-      }
-      
-      const touch = e.changedTouches[0];
-      const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
-      const targetCard = elementUnder?.closest('.player-card');
-      
-      if (touchElement) {
-        touchElement.style.opacity = '1';
-        touchElement.style.position = '';
-        touchElement.style.left = '';
-        touchElement.style.top = '';
-        touchElement.style.zIndex = '';
-        touchElement.style.pointerEvents = '';
-        touchElement.style.width = '';
-        touchElement.classList.remove('dragging');
-      }
-      
-      document.querySelectorAll('.player-card').forEach(card => {
-        card.classList.remove('drag-over');
-      });
-      
-      if (targetCard && targetCard !== touchElement && draggedPlayerId) {
-        const targetPlayerId = targetCard.dataset.playerId;
-        const targetContainer = targetCard.dataset.container;
-        swapPlayers(draggedPlayerId, targetPlayerId, draggedContainer, targetContainer);
-        
-        // Set flag to prevent click
-        dragHappened = true;
-        setTimeout(() => { dragHappened = false; }, DRAG_CLICK_DELAY);
-      }
-      
-      touchDragging = false;
-      touchElement = null;
-      draggedElement = null;
-      draggedPlayerId = null;
-      draggedContainer = null;
-    }
-
-    async function swapPlayers(playerId1, playerId2, container1, container2) {
-      showLoading('Updating roster...');
-      
+    async function executeSwap(playerId1, playerId2) {
       try {
+        showLoading('Swapping players...');
+        
+        const player1 = await playerManager.getPlayer(playerId1);
+        const player2 = await playerManager.getPlayer(playerId2);
+        
         // Get current roster
         const { starters, bench } = await teamManager.getTeamRoster(teamId);
         
-        let starterIds = starters.map(p => p.playerId);
-        let benchIds = bench.map(p => p.playerId);
+        // Find positions
+        let pos1 = { type: null, index: -1 };
+        let pos2 = { type: null, index: -1 };
         
-        // Find current positions
-        const idx1Starters = starterIds.indexOf(playerId1);
-        const idx1Bench = benchIds.indexOf(playerId1);
-        const idx2Starters = starterIds.indexOf(playerId2);
-        const idx2Bench = benchIds.indexOf(playerId2);
+        starters.forEach((p, i) => {
+          if (p.playerId === playerId1) pos1 = { type: 'starters', index: i };
+          if (p.playerId === playerId2) pos2 = { type: 'starters', index: i };
+        });
         
-        if (container1 === container2) {
-          // Same container - reorder within same list
-          if (container1 === 'startersContainer') {
-            // Reorder starters - calculate target index before any modifications
-            const targetIdx = idx2Starters > idx1Starters ? idx2Starters - 1 : idx2Starters;
-            starterIds.splice(idx1Starters, 1);
-            starterIds.splice(targetIdx, 0, playerId1);
+        bench.forEach((p, i) => {
+          if (p.playerId === playerId1) pos1 = { type: 'bench', index: i };
+          if (p.playerId === playerId2) pos2 = { type: 'bench', index: i };
+        });
+        
+        // Swap positions
+        if (pos1.type && pos2.type) {
+          let starterIds = starters.map(p => p.playerId);
+          let benchIds = bench.map(p => p.playerId);
+          
+          if (pos1.type === 'starters' && pos2.type === 'starters') {
+            // Both in starters
+            [starterIds[pos1.index], starterIds[pos2.index]] = [starterIds[pos2.index], starterIds[pos1.index]];
+          } else if (pos1.type === 'bench' && pos2.type === 'bench') {
+            // Both in bench
+            [benchIds[pos1.index], benchIds[pos2.index]] = [benchIds[pos2.index], benchIds[pos1.index]];
           } else {
-            // Reorder bench - calculate target index before any modifications
-            const targetIdx = idx2Bench > idx1Bench ? idx2Bench - 1 : idx2Bench;
-            benchIds.splice(idx1Bench, 1);
-            benchIds.splice(targetIdx, 0, playerId1);
+            // Different containers - swap between starters and bench
+            if (pos1.type === 'starters') {
+              starterIds[pos1.index] = playerId2;
+              benchIds[pos2.index] = playerId1;
+            } else {
+              benchIds[pos1.index] = playerId2;
+              starterIds[pos2.index] = playerId1;
+            }
           }
-        } else {
-          // Different containers - swap between starters and bench
-          if (container1 === 'startersContainer') {
-            // Player 1 from starters to bench, Player 2 from bench to starters
-            starterIds.splice(idx1Starters, 1);
-            benchIds.splice(idx2Bench, 1);
-            starterIds.splice(idx1Starters, 0, playerId2);
-            benchIds.push(playerId1); // Add to end of bench
-          } else {
-            // Player 1 from bench to starters, Player 2 from starters to bench
-            benchIds.splice(idx1Bench, 1);
-            starterIds.splice(idx2Starters, 1);
-            starterIds.splice(idx2Starters, 0, playerId1);
-            benchIds.push(playerId2); // Add to end of bench
-          }
+          
+          await teamManager.updateRoster(teamId, starterIds, benchIds);
+          
+          showToast('Players swapped!', 'success');
+          
+          // Clear swap mode
+          cancelSwap();
         }
-        
-        // Update roster in database
-        await teamManager.updateRoster(teamId, starterIds, benchIds);
-        
-        hideLoading();
-        showToast('Roster updated!', 'success');
-        
-        // Reload roster
-        await loadTeamRoster();
       } catch (error) {
+        console.error('Swap error:', error);
+        showToast('Failed to swap players', 'error');
         hideLoading();
-        console.error('Swap players error:', error);
-        showToast('Failed to update roster', 'error');
       }
+    }
+
+    function cancelSwap() {
+      sessionStorage.removeItem('swapMode');
+      sessionStorage.removeItem('swapPlayerId');
+      sessionStorage.removeItem('swapPlayerName');
+      location.reload();
     }
 
     function addPlayer() {
@@ -528,6 +325,28 @@
         showToast('No team specified', 'error');
         navigateToPage('dashboard.html');
         return;
+      }
+      
+      // Check for swap mode
+      const urlParams = new URLSearchParams(window.location.search);
+      swapMode = urlParams.get('swapMode') === 'true' || sessionStorage.getItem('swapMode') === 'true';
+      swapPlayerId = sessionStorage.getItem('swapPlayerId');
+      swapPlayerName = sessionStorage.getItem('swapPlayerName');
+      
+      if (swapMode && swapPlayerId && swapPlayerName) {
+        // Show swap banner
+        const banner = document.createElement('div');
+        banner.className = 'swap-mode-banner';
+        banner.innerHTML = `
+          <div class="swap-banner-content">
+            🔄 Select a player to swap with <strong>${sanitizeHTML(swapPlayerName)}</strong>
+            <button class="btn-cancel-swap" onclick="cancelSwap()">Cancel</button>
+          </div>
+        `;
+        const container = document.querySelector('.container');
+        if (container && container.firstChild) {
+          container.insertBefore(banner, container.firstChild);
+        }
       }
       
       loadTeamRoster();

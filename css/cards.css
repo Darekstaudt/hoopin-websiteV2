@@ -19,13 +19,7 @@
   max-width: 220px;
   min-height: 308px;
   
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-}
-
-.player-card:active {
-  cursor: grabbing;
+  cursor: pointer;
 }
 
 /* Card header */
@@ -88,9 +82,13 @@
 .stat-line-compact {
   font-size: 0.75rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
   white-space: nowrap;
+}
+
+.stat-line-compact strong {
+  font-weight: 700;
 }
 
 /* Right side - photo */
@@ -180,18 +178,7 @@
   }
 }
 
-/* Drag states */
-.player-card.dragging {
-  opacity: 0.5 !important;
-  cursor: grabbing;
-  transform: scale(1.05) rotate(3deg);
-}
 
-.player-card.drag-over {
-  border: 3px dashed var(--accent-primary);
-  background: rgba(255, 255, 255, 0.1);
-  transform: scale(1.02);
-}
 
 /* ===== Tier-Specific Cards (Full Gradient Background) ===== */
 
@@ -754,19 +741,109 @@
   z-index: 1;
 }
 
-/* ===== Drag and Drop Styles ===== */
-.player-card[draggable="true"] {
-  cursor: grab;
+/* ===== Swap Mode Banner ===== */
+.swap-mode-banner {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
 }
 
-.player-card.dragging {
-  opacity: 0.5 !important;
-  cursor: grabbing;
-  transform: scale(1.05) rotate(3deg);
+.swap-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.player-card.drag-over {
-  border: 3px dashed var(--accent-primary);
-  background: rgba(255, 255, 255, 0.1);
-  transform: scale(1.02);
+.btn-cancel-swap {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
+
+.btn-cancel-swap:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===== Mini Starter Cards (Dashboard Preview) ===== */
+.starter-preview-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+  margin-top: 1rem;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.starter-preview-row::-webkit-scrollbar {
+  height: 4px;
+}
+
+.starter-preview-row::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.mini-starter-card {
+  position: relative;
+  width: 80px;
+  height: 112px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mini-starter-card .mini-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mini-starter-card .mini-overall {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.mini-starter-card .mini-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 4px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 2;
+}
+
+
