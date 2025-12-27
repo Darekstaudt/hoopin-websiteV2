@@ -15,8 +15,6 @@ const DIVISIONS = {
     description: 'Full starting 5 + 1+ body',
     color: '#002D62',
     accentColor: '#BA0C2F',
-    minStarters: 5,
-    minBench: 1,
     icon: '🏆',
     tier: 1
   },
@@ -26,8 +24,6 @@ const DIVISIONS = {
     description: 'At least 1 player + 1+ body',
     color: '#C41E3A',
     accentColor: '#FFFFFF',
-    minStarters: 5,
-    minBench: 0,
     icon: '🥈',
     tier: 2
   },
@@ -37,8 +33,6 @@ const DIVISIONS = {
     description: 'At least 1 player',
     color: '#00843D',
     accentColor: '#FFD700',
-    minStarters: 1,
-    minBench: 0,
     icon: '🥉',
     tier: 3
   },
@@ -48,8 +42,6 @@ const DIVISIONS = {
     description: 'No players yet',
     color: '#8B8B8B',
     accentColor: '#CCCCCC',
-    minStarters: 0,
-    minBench: 0,
     icon: '📋',
     tier: 4
   }
