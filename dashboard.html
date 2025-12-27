@@ -177,11 +177,35 @@
         for (const team of teams) {
           const stats = await teamManager.getTeamStats(team.teamId);
           const division = await divisionManager.calculateTeamDivision(team.teamId);
+          const { starters } = await teamManager.getTeamRoster(team.teamId);
           
           const card = document.createElement('div');
           card.className = 'card hover-scale';
           card.style.cursor = 'pointer';
           card.onclick = () => viewTeam(team.teamId);
+          
+          // Get top 5 starters for preview
+          const starterPreviews = await Promise.all(
+            starters.slice(0, 5).map(async (starter) => {
+              const playerData = await playerManager.getPlayerStats(starter.playerId);
+              return playerData;
+            })
+          );
+          
+          const starterPreviewHTML = starterPreviews.length > 0 ? `
+            <div class="starter-preview-row">
+              ${starterPreviews.map(player => `
+                <div class="mini-starter-card" style="background: ${player.gradient || 'var(--card-bg)'}">
+                  <div class="mini-overall">${player.overall}</div>
+                  ${player.playerPhoto 
+                    ? `<img src="${player.playerPhoto}" class="mini-photo" alt="${player.playerName}">`
+                    : '<div class="mini-photo" style="display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--secondary-bg);">👤</div>'
+                  }
+                  <div class="mini-name">${sanitizeHTML(player.playerName)}</div>
+                </div>
+              `).join('')}
+            </div>
+          ` : '';
           
           card.innerHTML = `
             <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
@@ -212,6 +236,8 @@
                 <div style="color: var(--text-muted); font-size: 0.75rem;">Starters</div>
               </div>
             </div>
+            
+            ${starterPreviewHTML}
           `;
           
           container.appendChild(card);
@@ -335,9 +361,33 @@
         for (const team of myTeams) {
           const stats = await teamManager.getTeamStats(team.teamId);
           const divInfo = await divisionManager.getTeamDivisionInfo(team.teamId);
+          const { starters } = await teamManager.getTeamRoster(team.teamId);
           
           const card = document.createElement('div');
           card.className = 'card hover-scale';
+          
+          // Get top 5 starters for preview
+          const starterPreviews = await Promise.all(
+            starters.slice(0, 5).map(async (starter) => {
+              const playerData = await playerManager.getPlayerStats(starter.playerId);
+              return playerData;
+            })
+          );
+          
+          const starterPreviewHTML = starterPreviews.length > 0 ? `
+            <div class="starter-preview-row">
+              ${starterPreviews.map(player => `
+                <div class="mini-starter-card" style="background: ${player.gradient || 'var(--card-bg)'}">
+                  <div class="mini-overall">${player.overall}</div>
+                  ${player.playerPhoto 
+                    ? `<img src="${player.playerPhoto}" class="mini-photo" alt="${player.playerName}">`
+                    : '<div class="mini-photo" style="display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--secondary-bg);">👤</div>'
+                  }
+                  <div class="mini-name">${sanitizeHTML(player.playerName)}</div>
+                </div>
+              `).join('')}
+            </div>
+          ` : '';
           
           card.innerHTML = `
             <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
@@ -357,7 +407,9 @@
               </div>
             ` : ''}
             
-            <div style="display: flex; gap: 0.5rem;">
+            ${starterPreviewHTML}
+            
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
               <button class="btn btn-primary btn-small" style="flex: 1;" onclick="viewTeam('${team.teamId}')">
                 View Roster
               </button>
