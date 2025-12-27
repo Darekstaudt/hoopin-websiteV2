@@ -285,8 +285,12 @@
         const player1 = await playerManager.getPlayer(playerId1);
         const player2 = await playerManager.getPlayer(playerId2);
         
-        if (!player1 || !player2) {
-          throw new Error('One or both players not found');
+        if (!player1 && !player2) {
+          throw new Error('Neither player was found');
+        } else if (!player1) {
+          throw new Error('First player not found');
+        } else if (!player2) {
+          throw new Error('Second player not found');
         }
         
         console.log('✅ Players loaded:', player1.playerName, player2.playerName);
@@ -470,6 +474,9 @@
             swapPlayerName = player.playerName;
             showSwapBanner();
           }
+        }).catch(error => {
+          console.error('Error loading swap player:', error);
+          showToast('Error loading swap player', 'error');
         });
       }
       
