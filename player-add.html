@@ -243,6 +243,35 @@
             </div>
           </div>
 
+          <!-- Body Toggle -->
+          <div class="form-group">
+            <label>Body?</label>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.75rem;">
+              Does this player have a "body"? This helps determine your team's division.
+            </p>
+            <div class="toggle-buttons" style="display: flex; gap: 0.5rem;">
+              <button 
+                type="button" 
+                class="toggle-btn active" 
+                data-value="false"
+                onclick="setBodyValue(false)"
+                id="bodyNo"
+                style="flex: 1; padding: 0.75rem; border-radius: var(--radius-md); border: 2px solid var(--text-secondary); background: transparent; color: var(--text-primary); cursor: pointer; transition: all 0.2s;">
+                No
+              </button>
+              <button 
+                type="button" 
+                class="toggle-btn" 
+                data-value="true"
+                onclick="setBodyValue(true)"
+                id="bodyYes"
+                style="flex: 1; padding: 0.75rem; border-radius: var(--radius-md); border: 2px solid var(--text-secondary); background: transparent; color: var(--text-primary); cursor: pointer; transition: all 0.2s;">
+                Yes
+              </button>
+            </div>
+            <input type="hidden" id="isBody" name="isBody" value="false">
+          </div>
+
           <!-- Actions -->
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
@@ -287,6 +316,26 @@
       }
       // Otherwise return as is (assume it's already 0-100)
       return oldValue;
+    }
+
+    function setBodyValue(value) {
+      document.getElementById('isBody').value = value;
+      
+      // Update button styles
+      const noBtn = document.getElementById('bodyNo');
+      const yesBtn = document.getElementById('bodyYes');
+      
+      if (value === true) {
+        yesBtn.style.background = 'var(--accent-primary)';
+        yesBtn.style.borderColor = 'var(--accent-primary)';
+        noBtn.style.background = 'transparent';
+        noBtn.style.borderColor = 'var(--text-secondary)';
+      } else {
+        noBtn.style.background = 'var(--accent-primary)';
+        noBtn.style.borderColor = 'var(--accent-primary)';
+        yesBtn.style.background = 'transparent';
+        yesBtn.style.borderColor = 'var(--text-secondary)';
+      }
     }
 
     function updateCalculation() {
@@ -352,6 +401,7 @@
         stats,
         capBreakers,
         playerPhoto: playerPhotoBase64,
+        isBody: document.getElementById('isBody').value === 'true',
         teamId
       });
 
@@ -398,6 +448,7 @@
           playerName: document.getElementById('playerName').value,
           playerPhoto: playerPhotoBase64,
           teamId,
+          isBody: document.getElementById('isBody').value === 'true',
           stats,
           capBreakers
         };
@@ -480,6 +531,13 @@
             document.getElementById('photoPreview').classList.add('show');
           }
           
+          // Set body toggle
+          if (player.isBody) {
+            setBodyValue(true);
+          } else {
+            setBodyValue(false);
+          }
+          
           updateCalculation();
         }
       } else {
@@ -503,8 +561,17 @@
             document.getElementById('photoPreview').classList.add('show');
           }
           
+          // Restore body toggle from draft
+          if (draft.isBody !== undefined) {
+            setBodyValue(draft.isBody);
+          } else {
+            setBodyValue(false);
+          }
+          
           updateCalculation();
         } else {
+          // Initialize toggle to "No" for new players
+          setBodyValue(false);
           updateCalculation();
         }
       }

@@ -167,6 +167,7 @@
         
         card.innerHTML = `
           <div class="player-card-overall">${player.overall}</div>
+          ${player.isBody ? '<div class="body-badge">💪</div>' : ''}
           
           <div class="player-card-photo-left">
             ${player.playerPhoto 
