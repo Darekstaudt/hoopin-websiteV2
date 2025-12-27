@@ -516,3 +516,139 @@ img[data-src].loaded {
     transform: translateY(0);
   }
 }
+
+/* ===== Mobile Header Improvements ===== */
+@media (max-width: 768px) {
+  /* Smaller back button and menu button */
+  header .btn-icon {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.875rem;
+    min-width: auto;
+  }
+  
+  header .logo {
+    font-size: 1rem;
+  }
+  
+  header .logo span {
+    font-size: 1rem;
+  }
+}
+
+/* ===== Mobile Team Info Card ===== */
+@media (max-width: 768px) {
+  /* Reduce overall card padding */
+  .container > .card:first-of-type {
+    padding: 0.75rem !important;
+    margin-top: 0.5rem !important;
+  }
+  
+  /* Smaller team photo */
+  #teamPhotoContainer img,
+  #teamPhotoContainer div {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 1.5rem !important;
+  }
+  
+  /* Smaller team name */
+  #teamName {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  /* Smaller manager text */
+  #teamManager {
+    font-size: 0.75rem !important;
+  }
+  
+  /* Smaller division badge */
+  #teamDivision .division-badge {
+    font-size: 0.625rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+  
+  /* Tighter stats grid */
+  .container > .card:first-of-type > div[style*="grid-template-columns"] {
+    gap: 0.25rem !important;
+    margin-top: 0.5rem !important;
+  }
+  
+  .container > .card:first-of-type > div[style*="grid-template-columns"] > div {
+    padding: 0.5rem !important;
+  }
+  
+  /* Smaller stat numbers */
+  #totalPlayers,
+  #avgOverall,
+  #startersCount,
+  #benchCount {
+    font-size: 1.25rem !important;
+  }
+  
+  /* Smaller stat labels */
+  .container > .card:first-of-type > div[style*="grid-template-columns"] > div > div:last-child {
+    font-size: 0.625rem !important;
+  }
+}
+
+/* ===== Mobile Player Cards - Starting 5 ===== */
+@media (max-width: 768px) {
+  /* Show approximately 2.5-3 cards at once */
+  #startersContainer .player-card {
+    min-width: 280px;
+    max-width: 280px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 390px) {
+  /* Adjust for smaller phones like iPhone 12/13 mini */
+  #startersContainer .player-card {
+    min-width: 260px;
+    max-width: 260px;
+  }
+}
+
+/* ===== Mobile Player Cards - Bench (Smaller) ===== */
+@media (max-width: 768px) {
+  #benchContainer .player-card {
+    min-width: 220px;
+    max-width: 220px;
+    padding: 0.75rem;
+  }
+  
+  /* Smaller overall number for bench */
+  #benchContainer .player-card-overall {
+    font-size: 2rem !important;
+    top: 12px !important;
+    left: 12px !important;
+  }
+  
+  /* Smaller photo for bench */
+  #benchContainer .player-photo {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 1.5rem !important;
+  }
+  
+  /* Smaller stats text for bench */
+  #benchContainer .stat-line {
+    font-size: 0.7rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* Smaller player name for bench */
+  #benchContainer .player-card-name {
+    font-size: 0.95rem !important;
+    padding: 0.5rem !important;
+  }
+}
+
+/* ===== Section Headers ===== */
+@media (max-width: 768px) {
+  h3 {
+    font-size: 1.25rem !important;
+    margin: 1.5rem 0 0.75rem 0 !important;
+  }
+}

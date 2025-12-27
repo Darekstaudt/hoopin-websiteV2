@@ -12,7 +12,7 @@ const DIVISIONS = {
   D1: {
     name: 'D1',
     fullName: 'Division I',
-    description: 'Full starting 5 + 1+ bench',
+    description: 'Full starting 5 + 1+ body',
     color: '#002D62',
     accentColor: '#BA0C2F',
     minStarters: 5,
@@ -23,7 +23,7 @@ const DIVISIONS = {
   D2: {
     name: 'D2',
     fullName: 'Division II',
-    description: 'Complete starting 5',
+    description: 'At least 1 player + 1+ body',
     color: '#C41E3A',
     accentColor: '#FFFFFF',
     minStarters: 5,
@@ -61,29 +61,31 @@ class DivisionManager {
    */
   async calculateTeamDivision(teamId) {
     try {
-      const { starters, bench } = await teamManager.getTeamRoster(teamId);
-      
+      const players = await teamManager.getTeamPlayers(teamId);
+      const totalPlayers = players.length;
+      const bodyCount = players.filter(p => p.isBody === true).length;
+      const { starters } = await teamManager.getTeamRoster(teamId);
       const startersCount = starters.length;
-      const benchCount = bench.length;
-      const totalPlayers = startersCount + benchCount;
-
-      // D1: Full starting 5 + at least 1 bench
-      if (startersCount >= 5 && benchCount >= 1) {
-        return DIVISIONS.D1;
+      
+      let divisionName;
+      
+      // NEW DIVISION RULES:
+      // D1: Must have 5 players in starting lineup + at least 1 body
+      // D2: Must have at least 1 player + at least 1 body
+      // D3: Must have at least 1 player
+      // NAIA: Zero players on team roster
+      
+      if (startersCount >= 5 && bodyCount >= 1) {
+        divisionName = 'D1';
+      } else if (totalPlayers >= 1 && bodyCount >= 1) {
+        divisionName = 'D2';
+      } else if (totalPlayers >= 1) {
+        divisionName = 'D3';
+      } else {
+        divisionName = 'NAIA';
       }
-
-      // D2: Full starting 5
-      if (startersCount >= 5) {
-        return DIVISIONS.D2;
-      }
-
-      // D3: At least 1 player
-      if (totalPlayers >= 1) {
-        return DIVISIONS.D3;
-      }
-
-      // NAIA: No players
-      return DIVISIONS.NAIA;
+      
+      return DIVISIONS[divisionName];
     } catch (error) {
       console.error('❌ Calculate team division error:', error);
       return DIVISIONS.NAIA;
@@ -167,10 +169,13 @@ class DivisionManager {
   async getTeamDivisionInfo(teamId) {
     try {
       const division = await this.calculateTeamDivision(teamId);
+      const players = await teamManager.getTeamPlayers(teamId);
       const { starters, bench } = await teamManager.getTeamRoster(teamId);
       
       const startersCount = starters.length;
       const benchCount = bench.length;
+      const totalPlayers = players.length;
+      const bodyCount = players.filter(p => p.isBody === true).length;
       
       let nextDivision = null;
       let playersNeeded = 0;
@@ -179,11 +184,13 @@ class DivisionManager {
         nextDivision = DIVISIONS.D3;
         playersNeeded = 1;
       } else if (division.name === 'D3') {
+        // Need at least 1 body to reach D2
         nextDivision = DIVISIONS.D2;
-        playersNeeded = Math.max(0, 5 - startersCount);
+        playersNeeded = bodyCount >= 1 ? 0 : 1;
       } else if (division.name === 'D2') {
+        // Need 5 starters to reach D1 (already have at least 1 body)
         nextDivision = DIVISIONS.D1;
-        playersNeeded = Math.max(0, 1 - benchCount);
+        playersNeeded = Math.max(0, 5 - startersCount);
       }
 
       return {
@@ -192,7 +199,8 @@ class DivisionManager {
         playersNeeded,
         startersCount,
         benchCount,
-        totalPlayers: startersCount + benchCount
+        totalPlayers,
+        bodyCount
       };
     } catch (error) {
       console.error('❌ Get team division info error:', error);
@@ -202,7 +210,8 @@ class DivisionManager {
         playersNeeded: 1,
         startersCount: 0,
         benchCount: 0,
-        totalPlayers: 0
+        totalPlayers: 0,
+        bodyCount: 0
       };
     }
   }

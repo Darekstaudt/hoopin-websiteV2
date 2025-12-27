@@ -167,6 +167,7 @@
         
         card.innerHTML = `
           <div class="player-card-overall">${player.overall}</div>
+          ${player.isBody ? '<div style="position: absolute; top: 12px; right: 12px; background: rgba(255, 215, 0, 0.2); border: 2px solid #ffd700; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">💪</div>' : ''}
           
           <div class="player-card-photo-left">
             ${player.playerPhoto 
