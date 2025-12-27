@@ -85,6 +85,18 @@
     let draggedElement = null;
     let draggedPlayerId = null;
     let draggedContainer = null;
+    let touchDragging = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchElement = null;
+    let longPressTimer = null;
+    
+    // Touch drag constants
+    const LONG_PRESS_DURATION = 300; // milliseconds
+    const TOUCH_MOVE_THRESHOLD = 10; // pixels
+    const CARD_CENTER_OFFSET_X = 110; // pixels
+    const CARD_CENTER_OFFSET_Y = 150; // pixels
+    const DRAGGING_CARD_WIDTH = '220px';
 
     async function loadTeamRoster() {
       if (!teamId) return;
@@ -148,7 +160,7 @@
         card.dataset.playerId = player.playerId;
         card.dataset.container = containerId;
         
-        // Drag event handlers
+        // Desktop drag events
         card.addEventListener('dragstart', handleDragStart);
         card.addEventListener('dragover', handleDragOver);
         card.addEventListener('drop', handleDrop);
@@ -156,10 +168,15 @@
         card.addEventListener('dragenter', handleDragEnter);
         card.addEventListener('dragleave', handleDragLeave);
         
+        // Mobile touch events
+        card.addEventListener('touchstart', handleTouchStart, { passive: false });
+        card.addEventListener('touchmove', handleTouchMove, { passive: false });
+        card.addEventListener('touchend', handleTouchEnd);
+        card.addEventListener('touchcancel', handleTouchEnd);
+        
         // Click handler for viewing details
         card.addEventListener('click', (e) => {
-          // Only navigate if not currently dragging
-          if (!draggedElement) {
+          if (!draggedElement && !touchDragging) {
             viewPlayer(player.playerId);
           }
         });
@@ -269,6 +286,116 @@
         card.classList.remove('drag-over');
       });
       
+      draggedElement = null;
+      draggedPlayerId = null;
+      draggedContainer = null;
+    }
+
+    // Touch handlers for mobile drag-and-drop
+    function handleTouchStart(e) {
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      touchElement = e.currentTarget;
+      
+      // Long press to start dragging
+      longPressTimer = setTimeout(() => {
+        if (touchElement) {
+          touchDragging = true;
+          touchElement.style.opacity = '0.5';
+          touchElement.classList.add('dragging');
+          draggedElement = touchElement;
+          draggedPlayerId = touchElement.dataset.playerId;
+          draggedContainer = touchElement.dataset.container;
+          
+          // Haptic feedback if available
+          if (navigator.vibrate) {
+            navigator.vibrate(50);
+          }
+        }
+      }, LONG_PRESS_DURATION);
+    }
+
+    function handleTouchMove(e) {
+      if (!touchDragging) {
+        // Check if moved too much - cancel long press
+        const touch = e.touches[0];
+        const deltaX = Math.abs(touch.clientX - touchStartX);
+        const deltaY = Math.abs(touch.clientY - touchStartY);
+        if (deltaX > TOUCH_MOVE_THRESHOLD || deltaY > TOUCH_MOVE_THRESHOLD) {
+          clearTimeout(longPressTimer);
+        }
+        return;
+      }
+      
+      e.preventDefault(); // Prevent scrolling while dragging
+      
+      const touch = e.touches[0];
+      const currentX = touch.clientX;
+      const currentY = touch.clientY;
+      
+      // Move the card with finger
+      if (touchElement) {
+        touchElement.style.position = 'fixed';
+        touchElement.style.left = `${currentX - CARD_CENTER_OFFSET_X}px`;
+        touchElement.style.top = `${currentY - CARD_CENTER_OFFSET_Y}px`;
+        touchElement.style.zIndex = '1000';
+        touchElement.style.pointerEvents = 'none';
+        touchElement.style.width = DRAGGING_CARD_WIDTH;
+      }
+      
+      // Find card under touch point
+      const elementUnder = document.elementFromPoint(currentX, currentY);
+      const targetCard = elementUnder?.closest('.player-card');
+      
+      // Remove drag-over from all cards
+      document.querySelectorAll('.player-card').forEach(card => {
+        if (card !== touchElement) {
+          card.classList.remove('drag-over');
+        }
+      });
+      
+      // Add drag-over to target
+      if (targetCard && targetCard !== touchElement) {
+        targetCard.classList.add('drag-over');
+      }
+    }
+
+    function handleTouchEnd(e) {
+      clearTimeout(longPressTimer);
+      
+      if (!touchDragging) {
+        touchElement = null;
+        return;
+      }
+      
+      const touch = e.changedTouches[0];
+      const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+      const targetCard = elementUnder?.closest('.player-card');
+      
+      if (touchElement) {
+        touchElement.style.opacity = '1';
+        touchElement.style.position = '';
+        touchElement.style.left = '';
+        touchElement.style.top = '';
+        touchElement.style.zIndex = '';
+        touchElement.style.pointerEvents = '';
+        touchElement.style.width = '';
+        touchElement.classList.remove('dragging');
+      }
+      
+      document.querySelectorAll('.player-card').forEach(card => {
+        card.classList.remove('drag-over');
+      });
+      
+      if (targetCard && targetCard !== touchElement && draggedPlayerId) {
+        const targetPlayerId = targetCard.dataset.playerId;
+        const targetContainer = targetCard.dataset.container;
+        swapPlayers(draggedPlayerId, targetPlayerId, draggedContainer, targetContainer);
+      }
+      
+      touchDragging = false;
+      touchElement = null;
       draggedElement = null;
       draggedPlayerId = null;
       draggedContainer = null;

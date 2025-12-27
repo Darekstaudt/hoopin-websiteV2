@@ -7,16 +7,41 @@
 .player-card {
   position: relative;
   background: var(--card-bg);
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-lg);
-  box-shadow: var(--shadow-lg);
-  transition: all var(--transition-base);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   overflow: hidden;
-  min-width: 280px;
-  min-height: 320px;
-  cursor: pointer;
+  
+  /* Playing card proportions: 2.5 width : 3.5 height */
+  min-width: 200px;
+  max-width: 200px;
+  min-height: 280px;
+  
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
   display: flex;
   flex-direction: column;
+}
+
+.player-card:active {
+  cursor: grabbing;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  #startersContainer .player-card {
+    min-width: 220px;
+    max-width: 220px;
+    min-height: 308px;
+  }
+  
+  #benchContainer .player-card {
+    min-width: 180px;
+    max-width: 180px;
+    min-height: 252px;
+  }
 }
 
 .player-card::before {
@@ -116,63 +141,154 @@
 }
 
 /* ===== Tier-Specific Cards (Full Gradient Background) ===== */
+
+/* ===== DARK MATTER - Black/Purple/Pink Cosmic Fog ===== */
 .player-card.tier-dark-matter {
-  background: linear-gradient(135deg, #4a0e4e 0%, #81167a 50%, #c21d9e 100%);
-  border: 2px solid #ff00ff;
-  box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+  background: 
+    radial-gradient(ellipse at 30% 70%, rgba(199, 29, 158, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 30%, rgba(138, 43, 226, 0.3) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 50%, rgba(75, 0, 130, 0.3) 0%, transparent 70%),
+    linear-gradient(135deg, #000000 0%, #1a0033 40%, #2d1b4e 70%, #4a0e4e 100%);
+  border: 2px solid rgba(255, 0, 255, 0.6);
+  box-shadow: 
+    0 0 40px rgba(255, 0, 255, 0.5),
+    inset 0 0 60px rgba(138, 43, 226, 0.2);
 }
 
+/* ===== GALAXY OPAL - Purple/Blue/Pink Swirls ===== */
 .player-card.tier-galaxy-opal {
-  background: linear-gradient(135deg, #2d1b69 0%, #6a1b9a 33%, #4a148c 66%, #d946ef 100%);
-  border: 2px solid #f093fb;
-  box-shadow: 0 0 25px rgba(240, 147, 251, 0.4);
+  background: 
+    radial-gradient(ellipse at 20% 80%, rgba(240, 147, 251, 0.6) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(96, 165, 250, 0.5) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(167, 139, 250, 0.4) 0%, transparent 60%),
+    linear-gradient(135deg, #2d1b69 0%, #6a1b9a 33%, #4a148c 66%, #d946ef 100%);
+  border: 2px solid rgba(240, 147, 251, 0.8);
+  box-shadow: 
+    0 0 30px rgba(240, 147, 251, 0.4),
+    inset 0 0 50px rgba(167, 139, 250, 0.2);
 }
 
+/* ===== PINK DIAMOND - Faceted Hot Pink Crystal ===== */
 .player-card.tier-pink-diamond {
-  background: linear-gradient(135deg, #c2185b 0%, #e91e63 50%, #f50057 100%);
+  background: 
+    linear-gradient(120deg, #ff1493 0%, #ff69b4 25%, #c71585 25%, #ff1493 50%, #ff69b4 50%, #c71585 75%, #ff1493 75%, #ff69b4 100%);
+  background-size: 40px 80px;
   border: 2px solid #ff69b4;
-  box-shadow: 0 0 25px rgba(255, 105, 180, 0.4);
+  box-shadow: 
+    0 0 25px rgba(255, 105, 180, 0.6),
+    inset 0 0 40px rgba(255, 20, 147, 0.3);
+  position: relative;
 }
 
+.player-card.tier-pink-diamond::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%, rgba(199, 21, 133, 0.4) 100%);
+  pointer-events: none;
+}
+
+/* ===== DIAMOND - Angular Blue Crystal ===== */
 .player-card.tier-diamond {
-  background: linear-gradient(135deg, #0d47a1 0%, #1976d2 50%, #2196f3 100%);
+  background: 
+    linear-gradient(60deg, #0d47a1 0%, #1976d2 20%, #0d47a1 20%, #2196f3 40%, #0d47a1 40%, #1976d2 60%, #0d47a1 60%, #2196f3 80%, #0d47a1 80%);
+  background-size: 30px 60px;
   border: 2px solid #00bfff;
-  box-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
+  box-shadow: 
+    0 0 20px rgba(0, 191, 255, 0.5),
+    inset 0 0 35px rgba(33, 150, 243, 0.3);
 }
 
+/* ===== AMETHYST - Soft Lavender Polygons ===== */
 .player-card.tier-amethyst {
-  background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 50%, #9c27b0 100%);
+  background: 
+    linear-gradient(45deg, transparent 30%, rgba(156, 39, 176, 0.2) 30%, rgba(156, 39, 176, 0.2) 70%, transparent 70%),
+    linear-gradient(-45deg, transparent 30%, rgba(123, 31, 162, 0.2) 30%, rgba(123, 31, 162, 0.2) 70%, transparent 70%),
+    linear-gradient(90deg, #e1bee7 0%, #ce93d8 50%, #ba68c8 100%);
+  background-size: 60px 60px, 60px 60px, 100% 100%;
   border: 2px solid #b19cd9;
+  box-shadow: 0 0 15px rgba(177, 156, 217, 0.4);
 }
 
+/* ===== RUBY - Crimson with Flame-like Pink ===== */
 .player-card.tier-ruby {
-  background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 50%, #e57373 100%);
+  background: 
+    radial-gradient(ellipse at 30% 20%, rgba(255, 105, 180, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(255, 105, 180, 0.4) 0%, transparent 45%),
+    linear-gradient(135deg, #8b0000 0%, #b71c1c 30%, #d32f2f 60%, #e57373 100%);
   border: 2px solid #ff6b9d;
+  box-shadow: 
+    0 0 20px rgba(255, 107, 157, 0.4),
+    inset 0 0 30px rgba(229, 115, 115, 0.2);
 }
 
+/* ===== SAPPHIRE - Navy with Crystal Shards ===== */
 .player-card.tier-sapphire {
-  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%);
+  background: 
+    linear-gradient(75deg, transparent 40%, rgba(25, 118, 210, 0.4) 40%, rgba(25, 118, 210, 0.4) 42%, transparent 42%),
+    linear-gradient(105deg, transparent 55%, rgba(25, 118, 210, 0.4) 55%, rgba(25, 118, 210, 0.4) 57%, transparent 57%),
+    linear-gradient(135deg, #001529 0%, #0d47a1 40%, #1565c0 70%, #1976d2 100%);
   border: 2px solid #4169e1;
+  box-shadow: 0 0 18px rgba(65, 105, 225, 0.4);
 }
 
+/* ===== EMERALD - Vibrant Green Faceted Gem ===== */
 .player-card.tier-emerald {
-  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #43a047 100%);
+  background: 
+    linear-gradient(90deg, transparent 45%, rgba(76, 175, 80, 0.3) 45%, rgba(76, 175, 80, 0.3) 55%, transparent 55%),
+    linear-gradient(60deg, #004d00 0%, #1b5e20 30%, #2e7d32 60%, #43a047 100%);
+  background-size: 20px 100%, 100% 100%;
   border: 2px solid #50c878;
+  box-shadow: 
+    0 0 18px rgba(80, 200, 120, 0.4),
+    inset 0 0 25px rgba(67, 160, 71, 0.2);
 }
 
+/* ===== GOLD - Brushed Metallic ===== */
 .player-card.tier-gold {
-  background: linear-gradient(135deg, #f57f17 0%, #fbc02d 50%, #fdd835 100%);
+  background: 
+    linear-gradient(45deg, 
+      rgba(255, 215, 0, 0.2) 0%, transparent 25%, 
+      rgba(255, 215, 0, 0.2) 50%, transparent 75%, 
+      rgba(255, 215, 0, 0.2) 100%),
+    linear-gradient(135deg, #b8860b 0%, #daa520 30%, #ffd700 60%, #ffed4e 100%);
+  background-size: 80px 100%, 100% 100%;
   border: 2px solid #ffd700;
+  box-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.4),
+    inset 0 0 30px rgba(255, 237, 78, 0.2);
 }
 
+/* ===== SILVER - Sleek Metallic Mirror ===== */
 .player-card.tier-silver {
-  background: linear-gradient(135deg, #616161 0%, #757575 50%, #9e9e9e 100%);
+  background: 
+    linear-gradient(90deg, 
+      rgba(224, 224, 224, 0.3) 0%, transparent 25%, 
+      rgba(224, 224, 224, 0.3) 50%, transparent 75%, 
+      rgba(224, 224, 224, 0.3) 100%),
+    linear-gradient(180deg, #757575 0%, #9e9e9e 40%, #bdbdbd 70%, #e0e0e0 100%);
+  background-size: 100px 100%, 100% 100%;
   border: 2px solid #c0c0c0;
+  box-shadow: 
+    0 0 15px rgba(192, 192, 192, 0.4),
+    inset 0 0 25px rgba(224, 224, 224, 0.3);
 }
 
+/* ===== BRONZE - Aged Brown Metallic ===== */
 .player-card.tier-bronze {
-  background: linear-gradient(135deg, #4e342e 0%, #5d4037 50%, #6d4c41 100%);
+  background: 
+    linear-gradient(120deg, 
+      rgba(205, 127, 50, 0.3) 0%, transparent 30%, 
+      rgba(205, 127, 50, 0.3) 60%, transparent 90%),
+    linear-gradient(135deg, #3e2723 0%, #4e342e 30%, #5d4037 60%, #6d4c41 80%, #8d6e63 100%);
+  background-size: 70px 100%, 100% 100%;
   border: 2px solid #cd7f32;
+  box-shadow: 
+    0 0 15px rgba(205, 127, 50, 0.3),
+    inset 0 0 25px rgba(141, 110, 99, 0.2);
 }
 
 /* ===== Card Header ===== */
@@ -591,16 +707,13 @@
 }
 
 .player-card.dragging {
-  opacity: 0.5;
+  opacity: 0.5 !important;
   cursor: grabbing;
+  transform: scale(1.05) rotate(3deg);
 }
 
 .player-card.drag-over {
   border: 3px dashed var(--accent-primary);
-  background: rgba(0, 188, 212, 0.1);
+  background: rgba(255, 255, 255, 0.1);
   transform: scale(1.02);
-}
-
-.player-card:active {
-  cursor: grabbing;
 }
