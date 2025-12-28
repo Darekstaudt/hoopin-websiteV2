@@ -543,7 +543,68 @@ class DBManager {
       showToast('All data cleared', 'info');
     }
   }
+
+  /**
+   * Migrate roster from old array format to position-based format
+   */
+  async migrateRosterToPositions(teamId) {
+    console.log('🔄 Migrating roster to position-based format for team:', teamId);
+    
+    const team = await this.get('teams', teamId);
+    
+    if (!team) {
+      console.log('❌ Team not found');
+      return null;
+    }
+    
+    // Check if already migrated
+    if (team.roster && team.roster.positions) {
+      console.log('✅ Roster already uses position format');
+      return team;
+    }
+    
+    // Old format: { starters: [], bench: [] }
+    const oldStarters = team.roster?.starters || [];
+    const oldBench = team.roster?.bench || [];
+    
+    console.log('📋 Old roster:', { starters: oldStarters, bench: oldBench });
+    
+    // Create new position-based format
+    const newRoster = {
+      positions: {
+        PG: oldStarters[0] || null,
+        SG: oldStarters[1] || null,
+        SF: oldStarters[2] || null,
+        PF: oldStarters[3] || null,
+        C: oldStarters[4] || null
+      },
+      bench: []
+    };
+    
+    // Fill bench with 10 slots
+    for (let i = 0; i < 10; i++) {
+      newRoster.bench[i] = oldBench[i] || null;
+    }
+    
+    // Update team
+    team.roster = newRoster;
+    team.rosterFormat = 'positions'; // Flag for future checks
+    team.migratedAt = new Date().toISOString();
+    
+    await this.save('teams', teamId, team);
+    
+    console.log('✅ Migration complete. New roster:', newRoster);
+    
+    return team;
+  }
 }
 
 // Create global instance
 const dbManager = new DBManager();
+
+/**
+ * Standalone migration helper for easy access
+ */
+async function migrateRosterToPositions(teamId) {
+  return await dbManager.migrateRosterToPositions(teamId);
+}

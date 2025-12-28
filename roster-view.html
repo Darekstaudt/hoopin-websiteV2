@@ -14,7 +14,162 @@
   <link rel="stylesheet" href="css/animations.css">
   
   <style>
-/* Swap Mode Banner */
+/* Position Slots Layout */
+.positions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .positions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+.position-slot {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.position-slot.swap-mode {
+  cursor: pointer;
+  border-color: #f093fb;
+  box-shadow: 0 0 0 2px rgba(240, 147, 251, 0.3);
+}
+
+.position-slot.swap-mode:hover {
+  border-color: #f5576c;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
+}
+
+.position-label {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.5rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+
+.position-content {
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+/* Empty slot styling */
+.empty-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.empty-slot-icon {
+  font-size: 3rem;
+  opacity: 0.3;
+}
+
+.empty-slot.swap-mode {
+  color: #f093fb;
+  font-weight: 600;
+}
+
+.empty-slot.swap-mode .empty-slot-icon {
+  opacity: 0.6;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Bench Grid */
+.bench-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .bench-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.bench-slot {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.bench-slot::before {
+  content: attr(data-slot-number);
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.bench-slot.swap-mode {
+  cursor: pointer;
+  border-color: #f093fb;
+  border-style: solid;
+}
+
+.bench-slot.swap-mode:hover {
+  border-color: #f5576c;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(240, 147, 251, 0.3);
+}
+
+/* Player cards in slots - make them smaller */
+.position-content .player-card-mini,
+.bench-slot .player-card-mini {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Swap mode banner */
 .swap-mode-banner {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   color: white;
@@ -22,16 +177,13 @@
   border-radius: 12px;
   margin-bottom: 1.5rem;
   box-shadow: 0 6px 20px rgba(240, 147, 251, 0.5);
-  animation: swapBannerSlide 0.4s ease-out;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  animation: slideDown 0.3s ease-out;
 }
 
-@keyframes swapBannerSlide {
+@keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-40px);
+    transform: translateY(-20px);
   }
   to {
     opacity: 1;
@@ -51,52 +203,80 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex-wrap: wrap;
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.swap-banner-text strong {
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .btn-cancel-swap {
   background: rgba(255, 255, 255, 0.25);
   color: white;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  border: 2px solid white;
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 0.95rem;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
 }
 
 .btn-cancel-swap:hover {
   background: rgba(255, 255, 255, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.btn-cancel-swap:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+/* Mini player card CSS */
+.player-card-mini {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
 }
 
-@media (max-width: 480px) {
-  .swap-banner-content {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .btn-cancel-swap {
-    width: 100%;
-    justify-content: center;
-  }
+.player-card-mini:hover {
+  transform: translateY(-4px);
+}
+
+.player-mini-overall {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.player-mini-photo {
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.player-mini-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.player-icon {
+  font-size: 3rem;
+  opacity: 0.4;
+}
+
+.player-mini-name {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
   </style>
   
@@ -113,47 +293,69 @@
   </header>
 
   <div class="container page-transition">
-    <!-- Team Header -->
-    <div class="card" style="margin-top: 1rem;">
-      <div style="display: flex; gap: 1rem; align-items: center;">
-        <div id="teamPhotoContainer"></div>
-        <div style="flex: 1;">
-          <h2 style="margin: 0 0 0.5rem 0;" id="teamName"></h2>
-          <p style="margin: 0; color: var(--text-secondary);" id="teamManager"></p>
-          <div id="teamDivision" style="margin-top: 0.5rem;"></div>
+    <!-- Swap banner will be inserted here dynamically -->
+    
+    <div class="team-header" style="margin-top: 1rem;">
+      <h1 id="teamName" style="font-size: 2rem; margin-bottom: 1rem;">Team Roster</h1>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;">
+        <div style="text-align: center; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 12px;">
+          <div style="font-size: 2rem; font-weight: 700; color: var(--accent-primary);" id="totalPlayers">0</div>
+          <div style="font-size: 0.875rem; color: var(--text-muted);">Players</div>
         </div>
-      </div>
-      
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 1rem;">
-        <div style="text-align: center; padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-md);">
-          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-primary);" id="totalPlayers">0</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Players</div>
-        </div>
-        <div style="text-align: center; padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-md);">
-          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-primary);" id="avgOverall">0</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Avg OVR</div>
-        </div>
-        <div style="text-align: center; padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-md);">
-          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-primary);" id="startersCount">0</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Starters</div>
-        </div>
-        <div style="text-align: center; padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: var(--radius-md);">
-          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-primary);" id="benchCount">0</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Bench</div>
+        <div style="text-align: center; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 12px;">
+          <div style="font-size: 2rem; font-weight: 700; color: var(--accent-primary);" id="avgOverall">0</div>
+          <div style="font-size: 0.875rem; color: var(--text-muted);">Avg OVR</div>
         </div>
       </div>
     </div>
 
-    <!-- Starters -->
-    <h3 style="margin: 2rem 0 1rem 0;">Starting 5</h3>
-    <div class="player-cards-scroll" id="startersContainer"></div>
+    <!-- Starting 5 Positions -->
+    <section class="roster-section">
+      <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Starting 5</h2>
+      <div class="positions-grid">
+        <div class="position-slot" data-position="PG">
+          <div class="position-label">PG</div>
+          <div class="position-content" id="position-PG">
+            <!-- Player card or empty slot will be inserted here -->
+          </div>
+        </div>
+        
+        <div class="position-slot" data-position="SG">
+          <div class="position-label">SG</div>
+          <div class="position-content" id="position-SG"></div>
+        </div>
+        
+        <div class="position-slot" data-position="SF">
+          <div class="position-label">SF</div>
+          <div class="position-content" id="position-SF"></div>
+        </div>
+        
+        <div class="position-slot" data-position="PF">
+          <div class="position-label">PF</div>
+          <div class="position-content" id="position-PF"></div>
+        </div>
+        
+        <div class="position-slot" data-position="C">
+          <div class="position-label">C</div>
+          <div class="position-content" id="position-C"></div>
+        </div>
+      </div>
+    </section>
 
-    <!-- Bench -->
-    <h3 style="margin: 2rem 0 1rem 0;">Bench</h3>
-    <div class="player-cards-scroll" id="benchContainer"></div>
+    <!-- Bench - 10 Slots -->
+    <section class="roster-section" style="margin-top: 2rem;">
+      <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Bench (10 Slots)</h2>
+      <div class="bench-grid" id="benchGrid">
+        <!-- 10 bench slots will be generated here -->
+      </div>
+    </section>
+
+    <div class="roster-actions" style="margin-top: 2rem; text-align: center;">
+      <button class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;" onclick="addPlayer()">
+        <span style="font-size: 1.2rem;">➕</span> Add Player
+      </button>
+    </div>
   </div>
-
-  <button class="fab" onclick="addPlayer()" aria-label="Add player">➕</button>
 
   <script src="js/firebase-config.js"></script>
   <script src="js/utils.js"></script>
@@ -168,30 +370,31 @@
 
   <script>
     let teamId = null;
-    let currentTeam = null;
+    let currentRoster = null;
     
-    // === SWAP MODE STATE ===
+    // Swap mode state
     let swapMode = {
       active: false,
       sourcePlayerId: null,
-      sourcePlayerName: null
+      sourcePlayerName: null,
+      sourcePosition: null // 'PG', 'SG', 'SF', 'PF', 'C', or 'bench-0', 'bench-1', etc.
     };
 
-    // Check session storage on load
+    // Check swap mode from session storage
     function checkSwapMode() {
-      const storedSwapPlayerId = sessionStorage.getItem('swapPlayerId');
-      const storedSwapPlayerName = sessionStorage.getItem('swapPlayerName');
+      const storedPlayerId = sessionStorage.getItem('swapPlayerId');
+      const storedPlayerName = sessionStorage.getItem('swapPlayerName');
+      const storedPosition = sessionStorage.getItem('swapPosition');
       
-      if (storedSwapPlayerId && storedSwapPlayerName) {
+      if (storedPlayerId && storedPlayerName && storedPosition) {
         swapMode.active = true;
-        swapMode.sourcePlayerId = storedSwapPlayerId;
-        swapMode.sourcePlayerName = storedSwapPlayerName;
+        swapMode.sourcePlayerId = storedPlayerId;
+        swapMode.sourcePlayerName = storedPlayerName;
+        swapMode.sourcePosition = storedPosition;
         
-        console.log('═══════════════════════════════════════');
         console.log('🔄 SWAP MODE ACTIVE');
-        console.log('Source Player ID:', swapMode.sourcePlayerId);
-        console.log('Source Player Name:', swapMode.sourcePlayerName);
-        console.log('═══════════════════════════════════════');
+        console.log('  Player:', storedPlayerName, storedPlayerId);
+        console.log('  Current position:', storedPosition);
         
         showSwapBanner();
         return true;
@@ -212,7 +415,7 @@
           <div class="swap-banner-text">
             <span style="font-size: 1.5rem;">🔄</span>
             <strong>SWAP MODE:</strong>
-            <span>Tap another player to swap with <strong>${swapMode.sourcePlayerName}</strong></span>
+            <span>Click any position or bench slot to move <strong>${swapMode.sourcePlayerName}</strong> there</span>
           </div>
           <button class="btn-cancel-swap" onclick="cancelSwapMode()">
             ✕ Cancel
@@ -230,11 +433,11 @@
       swapMode.active = false;
       swapMode.sourcePlayerId = null;
       swapMode.sourcePlayerName = null;
+      swapMode.sourcePosition = null;
       
       sessionStorage.removeItem('swapPlayerId');
       sessionStorage.removeItem('swapPlayerName');
-      
-      console.log('❌ Swap mode cancelled');
+      sessionStorage.removeItem('swapPosition');
       
       const banner = document.querySelector('.swap-mode-banner');
       if (banner) {
@@ -244,254 +447,359 @@
       location.reload();
     }
 
-    function goBack() {
-      // Always return to dashboard when viewing a team roster
-      navigateToPage('dashboard.html');
+    // Load and display roster
+    async function loadRoster() {
+      try {
+        showLoading('Loading roster...');
+        
+        console.log('📋 Loading roster for team:', teamId);
+        
+        // Get team and migrate if needed
+        let team = await dbManager.get('teams', teamId);
+        
+        if (!team) {
+          throw new Error('Team not found');
+        }
+        
+        // Migrate to position format if needed
+        if (!team.roster || !team.roster.positions) {
+          console.log('🔄 Migrating roster format...');
+          team = await migrateRosterToPositions(teamId);
+        }
+        
+        currentRoster = team.roster;
+        
+        console.log('📋 Current roster:', currentRoster);
+        
+        // Update team name
+        document.getElementById('teamName').textContent = team.teamName;
+        document.getElementById('teamNameHeader').textContent = team.teamName;
+        
+        // Render starting positions
+        await renderPositions(currentRoster.positions);
+        
+        // Render bench
+        await renderBench(currentRoster.bench);
+        
+        // Update stats
+        await updateRosterStats(currentRoster);
+        
+        // Apply swap mode styling if active
+        if (swapMode.active) {
+          enableSwapModeUI();
+        }
+        
+      } catch (error) {
+        console.error('❌ Error loading roster:', error);
+        showToast('Failed to load roster: ' + error.message, 'error');
+      } finally {
+        hideLoading();
+      }
     }
 
-    async function loadTeamRoster() {
-      if (!teamId) return;
+    // Render starting positions
+    async function renderPositions(positions) {
+      const positionKeys = ['PG', 'SG', 'SF', 'PF', 'C'];
+      
+      for (const pos of positionKeys) {
+        const container = document.getElementById(`position-${pos}`);
+        const playerId = positions[pos];
+        
+        if (playerId) {
+          // Load and render player
+          try {
+            const player = await playerManager.getPlayer(playerId);
+            container.innerHTML = renderPlayerCardMini(player);
+            
+            // Add click handler
+            container.querySelector('.player-card-mini').addEventListener('click', (e) => {
+              handleSlotClick(pos, playerId, player.playerName);
+            });
+          } catch (error) {
+            console.error(`Error loading player for ${pos}:`, error);
+            container.innerHTML = renderEmptySlot(pos);
+          }
+        } else {
+          // Empty slot
+          container.innerHTML = renderEmptySlot(pos);
+          container.addEventListener('click', () => {
+            handleSlotClick(pos, null, null);
+          });
+        }
+      }
+    }
 
-      showLoading('Loading roster...');
+    // Render bench slots
+    async function renderBench(benchSlots) {
+      const benchGrid = document.getElementById('benchGrid');
+      benchGrid.innerHTML = '';
+      
+      for (let i = 0; i < 10; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'bench-slot';
+        slot.dataset.slotNumber = `Bench ${i + 1}`;
+        slot.dataset.position = `bench-${i}`;
+        
+        const playerId = benchSlots[i];
+        
+        if (playerId) {
+          // Load and render player
+          try {
+            const player = await playerManager.getPlayer(playerId);
+            slot.innerHTML = renderPlayerCardMini(player);
+            
+            // Add click handler
+            slot.querySelector('.player-card-mini').addEventListener('click', (e) => {
+              handleSlotClick(`bench-${i}`, playerId, player.playerName);
+            });
+          } catch (error) {
+            console.error(`Error loading bench player ${i}:`, error);
+            slot.innerHTML = renderEmptySlot(`bench-${i}`);
+          }
+        } else {
+          // Empty slot
+          slot.innerHTML = renderEmptySlot(`bench-${i}`);
+          slot.addEventListener('click', () => {
+            handleSlotClick(`bench-${i}`, null, null);
+          });
+        }
+        
+        benchGrid.appendChild(slot);
+      }
+    }
 
-      try {
-        currentTeam = await teamManager.getTeam(teamId);
-        const { starters, bench } = await teamManager.getTeamRoster(teamId);
-        const stats = await teamManager.getTeamStats(teamId);
-        const division = await divisionManager.calculateTeamDivision(teamId);
+    // Render mini player card for slots
+    function renderPlayerCardMini(player) {
+      return `
+        <div class="player-card-mini ${player.tierClass}" data-player-id="${player.playerId}">
+          <div class="player-mini-overall">${player.overall}</div>
+          <div class="player-mini-photo">
+            ${player.playerPhoto 
+              ? `<img src="${player.playerPhoto}" alt="${player.playerName}">`
+              : '<div class="player-icon">👤</div>'
+            }
+          </div>
+          <div class="player-mini-name">${sanitizeHTML(player.playerName)}</div>
+        </div>
+      `;
+    }
 
-        hideLoading();
+    // Render empty slot
+    function renderEmptySlot(position) {
+      return `
+        <div class="empty-slot ${swapMode.active ? 'swap-mode' : ''}">
+          <div class="empty-slot-icon">${swapMode.active ? '🎯' : '➕'}</div>
+          <div>${swapMode.active ? 'Click to move here' : 'Empty'}</div>
+        </div>
+      `;
+    }
 
-        if (!currentTeam) {
-          showToast('Team not found', 'error');
+    // Handle slot click (view player or swap)
+    function handleSlotClick(position, playerId, playerName) {
+      if (swapMode.active) {
+        // SWAP MODE - execute swap
+        console.log('🎯 Slot clicked in swap mode:', position);
+        
+        if (position === swapMode.sourcePosition) {
+          showToast('Player is already in this position!', 'error');
           return;
         }
-
-        document.getElementById('teamNameHeader').textContent = currentTeam.teamName;
-        document.getElementById('teamName').textContent = currentTeam.teamName;
-        document.getElementById('teamManager').textContent = `Manager: ${currentTeam.manager}`;
         
-        const photoContainer = document.getElementById('teamPhotoContainer');
-        if (currentTeam.teamPhoto) {
-          photoContainer.innerHTML = `<img src="${currentTeam.teamPhoto}" style="width: 80px; height: 80px; border-radius: var(--radius-lg); object-fit: cover;">`;
+        // Confirm swap
+        const destLabel = position.startsWith('bench') 
+          ? `Bench slot ${parseInt(position.split('-')[1]) + 1}`
+          : position;
+        
+        const currentLabel = swapMode.sourcePosition.startsWith('bench')
+          ? `Bench slot ${parseInt(swapMode.sourcePosition.split('-')[1]) + 1}`
+          : swapMode.sourcePosition;
+        
+        const targetName = playerName || 'Empty spot';
+        
+        const confirmed = confirm(
+          `Move ${swapMode.sourcePlayerName} from ${currentLabel} to ${destLabel}?\n\n` +
+          `${targetName} will ${playerName ? `move to ${currentLabel}` : 'stay empty'}.`
+        );
+        
+        if (confirmed) {
+          performSlotSwap(swapMode.sourcePosition, position);
+        }
+      } else {
+        // NORMAL MODE - view player details
+        if (playerId) {
+          viewPlayer(playerId);
         } else {
-          photoContainer.innerHTML = '<div style="width: 80px; height: 80px; background: var(--secondary-bg); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 3rem;">🏀</div>';
+          // Empty slot - add player
+          addPlayer();
         }
-
-        document.getElementById('teamDivision').innerHTML = divisionManager.createDivisionBadge(division.name, 'small');
-
-        document.getElementById('totalPlayers').textContent = stats.totalPlayers;
-        document.getElementById('avgOverall').textContent = stats.avgOverall;
-        document.getElementById('startersCount').textContent = `${stats.startersCount}/5`;
-        document.getElementById('benchCount').textContent = stats.benchCount;
-
-        renderPlayers('startersContainer', starters, 'No starters yet');
-        renderPlayers('benchContainer', bench, 'No bench players yet');
-      } catch (error) {
-        hideLoading();
-        console.error('Load roster error:', error);
-        showToast('Failed to load roster', 'error');
       }
     }
 
-    function renderPlayers(containerId, players, emptyMessage) {
-      const container = document.getElementById(containerId);
-      
-      if (players.length === 0) {
-        container.innerHTML = `<div style="padding: 2rem; text-align: center; color: var(--text-muted);">${emptyMessage}</div>`;
-        return;
-      }
-
-      container.innerHTML = '';
-      
-      players.forEach((player, index) => {
-        const card = document.createElement('div');
-        card.className = `player-card ${player.tierClass} gpu-accelerated`;
-        card.dataset.playerId = player.playerId;
-        card.dataset.container = containerId;
-        
-        // Handle click based on swap mode
-        card.addEventListener('click', async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          const playerId = player.playerId;
-          const playerName = player.playerName;
-          
-          if (swapMode.active) {
-            // SWAP MODE
-            console.log('🎯 Player clicked in swap mode:', playerName, playerId);
-            
-            if (playerId === swapMode.sourcePlayerId) {
-              showToast('Cannot swap a player with themselves!', 'error');
-              return;
-            }
-            
-            const confirmed = confirm(
-              `Swap players?\n\n${swapMode.sourcePlayerName} ↔ ${playerName}\n\nTap OK to confirm.`
-            );
-            
-            if (confirmed) {
-              await performSwap(swapMode.sourcePlayerId, playerId);
-            }
-          } else {
-            // NORMAL MODE
-            viewPlayer(playerId);
-          }
-        });
-        
-        // Visual indicator for swap mode
-        if (swapMode.active && player.playerId === swapMode.sourcePlayerId) {
-          card.style.opacity = '0.6';
-          card.style.outline = '3px solid #f093fb';
-          card.style.outlineOffset = '3px';
-        }
-        
-        card.innerHTML = `
-          <div class="player-card-overall-badge">
-            <div class="overall-number">${player.overall}</div>
-          </div>
-          <div class="player-card-body">
-            <div class="player-card-stats-side">
-              <div class="stat-line-compact"><strong>Face:</strong> ${player.stats?.face || 0}</div>
-              <div class="stat-line-compact"><strong>Eyes:</strong> ${player.stats?.eyes || 0}</div>
-              <div class="stat-line-compact"><strong>Top:</strong> ${player.stats?.top || 0}</div>
-              <div class="stat-line-compact"><strong>Bottom:</strong> ${player.stats?.bottom || 0}</div>
-              <div class="stat-line-compact"><strong>Fitness:</strong> ${player.stats?.fitness || 0}</div>
-              <div class="stat-line-compact"><strong>Personality:</strong> ${player.stats?.personality || 0}</div>
-            </div>
-            <div class="player-card-photo-side">
-              ${player.playerPhoto 
-                ? `<img src="${player.playerPhoto}" alt="${player.playerName}">`
-                : '<div class="player-icon-large">👤</div>'
-              }
-            </div>
-          </div>
-          <div class="player-card-name-bar">${sanitizeHTML(player.playerName)}</div>
-        `;
-        
-        container.appendChild(card);
-      });
-    }
-
-    async function performSwap(playerId1, playerId2) {
+    // Perform slot swap
+    async function performSlotSwap(sourcePos, targetPos) {
       try {
-        showLoading('Swapping players...');
+        showLoading('Swapping positions...');
         
         console.log('═══════════════════════════════════════');
-        console.log('🔄 PERFORMING SWAP');
-        console.log('Player 1:', playerId1);
-        console.log('Player 2:', playerId2);
-        console.log('Team ID:', teamId);
+        console.log('🔄 PERFORMING SLOT SWAP');
+        console.log('  From:', sourcePos);
+        console.log('  To:', targetPos);
         
-        // Get team from database
         const team = await dbManager.get('teams', teamId);
         
         if (!team || !team.roster) {
           throw new Error('Team or roster not found');
         }
         
-        console.log('📦 Team loaded:', team.teamName);
-        console.log('📋 Current roster:', JSON.stringify(team.roster, null, 2));
+        const roster = team.roster;
         
-        // Clone arrays
-        const newStarters = [...(team.roster.starters || [])];
-        const newBench = [...(team.roster.bench || [])];
+        console.log('📋 Current roster:', roster);
         
-        console.log('📍 Before swap:');
-        console.log('  Starters:', newStarters);
-        console.log('  Bench:', newBench);
+        // Get player IDs from source and target
+        let sourcePlayerId, targetPlayerId;
         
-        // Find positions
-        const p1InStarters = newStarters.indexOf(playerId1);
-        const p1InBench = newBench.indexOf(playerId1);
-        const p2InStarters = newStarters.indexOf(playerId2);
-        const p2InBench = newBench.indexOf(playerId2);
-        
-        console.log('📍 Positions:');
-        console.log('  P1 in starters:', p1InStarters);
-        console.log('  P1 in bench:', p1InBench);
-        console.log('  P2 in starters:', p2InStarters);
-        console.log('  P2 in bench:', p2InBench);
-        
-        // Perform swap
-        if (p1InStarters >= 0 && p2InStarters >= 0) {
-          // Both in starters
-          newStarters[p1InStarters] = playerId2;
-          newStarters[p2InStarters] = playerId1;
-          console.log('✅ Swapped: Both in starters');
-        } else if (p1InBench >= 0 && p2InBench >= 0) {
-          // Both in bench
-          newBench[p1InBench] = playerId2;
-          newBench[p2InBench] = playerId1;
-          console.log('✅ Swapped: Both in bench');
-        } else if (p1InStarters >= 0 && p2InBench >= 0) {
-          // P1 in starters, P2 in bench
-          newStarters[p1InStarters] = playerId2;
-          newBench[p2InBench] = playerId1;
-          console.log('✅ Swapped: P1 starter → bench, P2 bench → starter');
-        } else if (p1InBench >= 0 && p2InStarters >= 0) {
-          // P1 in bench, P2 in starters
-          newBench[p1InBench] = playerId2;
-          newStarters[p2InStarters] = playerId1;
-          console.log('✅ Swapped: P1 bench → starter, P2 starter → bench');
+        // Get source player ID
+        if (sourcePos.startsWith('bench')) {
+          const benchIdx = parseInt(sourcePos.split('-')[1]);
+          sourcePlayerId = roster.bench[benchIdx];
         } else {
-          throw new Error('Could not find both players in roster');
+          sourcePlayerId = roster.positions[sourcePos];
         }
         
-        console.log('📍 After swap:');
-        console.log('  Starters:', newStarters);
-        console.log('  Bench:', newBench);
+        // Get target player ID (may be null if empty)
+        if (targetPos.startsWith('bench')) {
+          const benchIdx = parseInt(targetPos.split('-')[1]);
+          targetPlayerId = roster.bench[benchIdx] || null;
+        } else {
+          targetPlayerId = roster.positions[targetPos] || null;
+        }
         
-        // Update team
-        team.roster.starters = newStarters;
-        team.roster.bench = newBench;
+        console.log('📍 Players:');
+        console.log('  Source player:', sourcePlayerId);
+        console.log('  Target player:', targetPlayerId);
+        
+        // Perform swap
+        if (sourcePos.startsWith('bench')) {
+          const benchIdx = parseInt(sourcePos.split('-')[1]);
+          roster.bench[benchIdx] = targetPlayerId;
+        } else {
+          roster.positions[sourcePos] = targetPlayerId;
+        }
+        
+        if (targetPos.startsWith('bench')) {
+          const benchIdx = parseInt(targetPos.split('-')[1]);
+          roster.bench[benchIdx] = sourcePlayerId;
+        } else {
+          roster.positions[targetPos] = sourcePlayerId;
+        }
+        
+        console.log('📋 New roster:', roster);
+        
+        // Save
+        team.roster = roster;
         team.updatedAt = new Date().toISOString();
         
-        console.log('💾 Saving to database...');
-        
-        // Save to database
-        const saveResult = await dbManager.save('teams', teamId, team);
-        console.log('💾 Save result:', saveResult);
+        console.log('💾 Saving...');
+        await dbManager.save('teams', teamId, team);
         
         // Verify
         const verifyTeam = await dbManager.get('teams', teamId);
-        console.log('🔍 Verification:');
-        console.log('  Starters:', verifyTeam.roster.starters);
-        console.log('  Bench:', verifyTeam.roster.bench);
-        
-        // Get player names
-        const player1 = await playerManager.getPlayer(playerId1);
-        const player2 = await playerManager.getPlayer(playerId2);
-        
+        console.log('🔍 Verification:', verifyTeam.roster);
         console.log('═══════════════════════════════════════');
         console.log('✅ SWAP COMPLETE');
-        console.log(`   ${player1.playerName} ↔ ${player2.playerName}`);
         console.log('═══════════════════════════════════════');
         
-        showToast(`✅ Swapped ${player1.playerName} ↔ ${player2.playerName}`, 'success');
+        showToast('✅ Position updated!', 'success');
         
         // Clear swap mode
         sessionStorage.removeItem('swapPlayerId');
         sessionStorage.removeItem('swapPlayerName');
+        sessionStorage.removeItem('swapPosition');
         
         // Reload
         setTimeout(() => {
-          console.log('🔄 Reloading page...');
           window.location.reload();
-        }, 1500);
+        }, 1000);
         
       } catch (error) {
         console.error('═══════════════════════════════════════');
         console.error('❌ SWAP FAILED');
         console.error('Error:', error);
-        console.error('Stack:', error.stack);
         console.error('═══════════════════════════════════════');
-        
         showToast('Swap failed: ' + error.message, 'error');
       } finally {
         hideLoading();
       }
+    }
+
+    // Enable swap mode UI
+    function enableSwapModeUI() {
+      // Add swap-mode class to all slots
+      document.querySelectorAll('.position-slot, .bench-slot').forEach(slot => {
+        slot.classList.add('swap-mode');
+      });
+      
+      // Update empty slots
+      document.querySelectorAll('.empty-slot').forEach(slot => {
+        slot.classList.add('swap-mode');
+        slot.querySelector('.empty-slot-icon').textContent = '🎯';
+        slot.querySelector('div:last-child').textContent = 'Click to move here';
+      });
+    }
+
+    // Update roster stats
+    async function updateRosterStats(roster) {
+      let totalPlayers = 0;
+      let totalOverall = 0;
+      
+      // Count positions
+      for (const pos of ['PG', 'SG', 'SF', 'PF', 'C']) {
+        if (roster.positions[pos]) {
+          totalPlayers++;
+          try {
+            const player = await playerManager.getPlayer(roster.positions[pos]);
+            totalOverall += player.overall;
+          } catch (e) {}
+        }
+      }
+      
+      // Count bench
+      for (const playerId of roster.bench) {
+        if (playerId) {
+          totalPlayers++;
+          try {
+            const player = await playerManager.getPlayer(playerId);
+            totalOverall += player.overall;
+          } catch (e) {}
+        }
+      }
+      
+      document.getElementById('totalPlayers').textContent = totalPlayers;
+      document.getElementById('avgOverall').textContent = totalPlayers > 0 
+        ? Math.round(totalOverall / totalPlayers) 
+        : 0;
+    }
+
+    // Helper: Find player position in roster
+    function findPlayerPosition(roster, playerId) {
+      // Check positions
+      for (const [pos, id] of Object.entries(roster.positions)) {
+        if (id === playerId) {
+          return pos;
+        }
+      }
+      
+      // Check bench
+      const benchIdx = roster.bench.indexOf(playerId);
+      if (benchIdx >= 0) {
+        return `bench-${benchIdx}`;
+      }
+      
+      return null;
+    }
+
+    function goBack() {
+      navigateToPage('dashboard.html');
     }
 
     function addPlayer() {
@@ -518,17 +826,19 @@
     }
 
     async function shareTeam() {
-      if (!currentTeam) return;
+      if (!currentRoster) return;
+      const team = await dbManager.get('teams', teamId);
       await shareData({
-        title: `${currentTeam.teamName} - Hoopin'`,
-        text: `Check out my team: ${currentTeam.teamName}`,
+        title: `${team.teamName} - Hoopin'`,
+        text: `Check out my team: ${team.teamName}`,
         url: window.location.href
       });
     }
 
     async function deleteTeam() {
-      if (!currentTeam) return;
-      if (!confirm(`Delete ${currentTeam.teamName}? This cannot be undone.`)) return;
+      if (!teamId) return;
+      const team = await dbManager.get('teams', teamId);
+      if (!confirm(`Delete ${team.teamName}? This cannot be undone.`)) return;
       
       showLoading('Deleting team...');
       const result = await teamManager.deleteTeam(teamId);
@@ -542,9 +852,9 @@
       }
     }
 
+    // Page load
     window.addEventListener('load', async () => {
       console.log('🏀 Roster view loading...');
-      setupCommonElements();
       
       const urlParams = new URLSearchParams(window.location.search);
       teamId = urlParams.get('teamId');
@@ -554,11 +864,11 @@
         return;
       }
       
-      // Check if returning from swap initiation
+      // Check swap mode
       checkSwapMode();
       
       // Load roster
-      await loadTeamRoster();
+      await loadRoster();
     });
   </script>
 </body>
