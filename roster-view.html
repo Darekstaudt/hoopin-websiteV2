@@ -18,16 +18,16 @@
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   color: white;
   padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
-  animation: slideIn 0.3s ease-out;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 6px 16px rgba(240, 147, 251, 0.5);
+  animation: slideDown 0.4s ease-out;
 }
 
-@keyframes slideIn {
+@keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-30px);
   }
   to {
     opacity: 1;
@@ -44,19 +44,25 @@
 }
 
 .btn-cancel-swap {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   color: white;
-  border: 1px solid white;
+  border: 2px solid white;
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1rem;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .btn-cancel-swap:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.35);
   transform: scale(1.05);
+}
+
+.btn-cancel-swap:active {
+  transform: scale(0.98);
 }
   </style>
   
@@ -150,17 +156,21 @@
       banner.className = 'swap-mode-banner';
       banner.innerHTML = `
         <div class="swap-banner-content">
-          <span>🔄 <strong>SWAP MODE:</strong> Select a player to swap with <strong>${swapSourcePlayerName}</strong></span>
+          <span style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.5rem;">🔄</span>
+            <strong style="font-size: 1rem;">SWAP MODE:</strong>
+            <span>Click a player to swap with <strong>${swapSourcePlayerName}</strong></span>
+          </span>
           <button class="btn-cancel-swap" onclick="exitSwapMode()">✕ Cancel</button>
         </div>
       `;
       
       const container = document.querySelector('.container');
-      if (container) {
+      if (container && container.firstChild) {
         container.insertBefore(banner, container.firstChild);
       }
       
-      console.log('🔄 Swap mode activated for player:', swapSourcePlayerId, swapSourcePlayerName);
+      console.log('📢 Swap banner displayed');
     }
 
     async function loadTeamRoster() {
@@ -239,44 +249,37 @@
           }
         });
         
-        // Add cursor styling and highlight for swap mode
-        card.style.cursor = 'pointer';
-        if (isSwapMode && player.playerId === swapSourcePlayerId) {
-          card.style.opacity = '0.6';
-          card.style.border = '2px solid #f093fb';
+        // Visual indicator for swap mode
+        if (isSwapMode) {
+          card.style.cursor = 'pointer';
+          if (player.playerId === swapSourcePlayerId) {
+            card.style.opacity = '0.7';
+            card.style.outline = '3px solid #f093fb';
+            card.style.outlineOffset = '2px';
+          }
         }
         
         card.innerHTML = `
-          <div class="player-card-header">
-            <div class="player-card-overall-badge">
-              <div class="overall-number">${player.overall}</div>
-            </div>
+          <div class="player-card-overall-badge">
+            <div class="overall-number">${player.overall}</div>
           </div>
           <div class="player-card-body">
-            <div class="player-card-left">
-              <div class="player-stats-compact">
-                <div class="stat-line-compact"><strong>Face:</strong> ${player.stats?.face || 0}</div>
-                <div class="stat-line-compact"><strong>Eyes:</strong> ${player.stats?.eyes || 0}</div>
-                <div class="stat-line-compact"><strong>Top:</strong> ${player.stats?.top || 0}</div>
-                <div class="stat-line-compact"><strong>Bottom:</strong> ${player.stats?.bottom || 0}</div>
-                <div class="stat-line-compact"><strong>Fitness:</strong> ${player.stats?.fitness || 0}</div>
-                <div class="stat-line-compact"><strong>Personality:</strong> ${player.stats?.personality || 0}</div>
-                <div class="stat-line-cap"><strong>+Athletic:</strong> ${player.capBreakers?.athletic || 0}</div>
-                <div class="stat-line-cap"><strong>+Comfort:</strong> ${player.capBreakers?.comfort || 0}</div>
-              </div>
+            <div class="player-card-stats-side">
+              <div class="stat-line-compact"><strong>Face:</strong> ${player.stats?.face || 0}</div>
+              <div class="stat-line-compact"><strong>Eyes:</strong> ${player.stats?.eyes || 0}</div>
+              <div class="stat-line-compact"><strong>Top:</strong> ${player.stats?.top || 0}</div>
+              <div class="stat-line-compact"><strong>Bottom:</strong> ${player.stats?.bottom || 0}</div>
+              <div class="stat-line-compact"><strong>Fitness:</strong> ${player.stats?.fitness || 0}</div>
+              <div class="stat-line-compact"><strong>Personality:</strong> ${player.stats?.personality || 0}</div>
             </div>
-            <div class="player-card-right">
-              <div class="player-photo-large">
-                ${player.playerPhoto 
-                  ? `<img src="${player.playerPhoto}" alt="${player.playerName}">`
-                  : '<div class="player-icon-large">👤</div>'
-                }
-              </div>
+            <div class="player-card-photo-side">
+              ${player.playerPhoto 
+                ? `<img src="${player.playerPhoto}" alt="${player.playerName}">`
+                : '<div class="player-icon-large">👤</div>'
+              }
             </div>
           </div>
-          <div class="player-card-footer">
-            <div class="player-name-bar">${sanitizeHTML(player.playerName)}</div>
-          </div>
+          <div class="player-card-name-bar">${sanitizeHTML(player.playerName)}</div>
         `;
         
         container.appendChild(card);
@@ -287,12 +290,17 @@
       // Prevent swapping with self
       if (targetPlayerId === swapSourcePlayerId) {
         showToast('Cannot swap a player with themselves!', 'error');
+        console.log('⚠️ Attempted to swap player with themselves');
         return;
       }
       
       try {
         showLoading('Swapping players...');
-        console.log('🔄 EXECUTING SWAP:', swapSourcePlayerId, '↔️', targetPlayerId);
+        console.log('═══════════════════════════════════════');
+        console.log('🔄 SWAP EXECUTION START');
+        console.log('Source Player ID:', swapSourcePlayerId);
+        console.log('Target Player ID:', targetPlayerId);
+        console.log('═══════════════════════════════════════');
         
         // Get the team data
         const team = await dbManager.get('teams', teamId);
@@ -300,7 +308,9 @@
           throw new Error('Team or roster not found');
         }
         
-        console.log('📋 Current roster:', team.roster);
+        console.log('📋 Current roster before swap:');
+        console.log('  Starters:', team.roster.starters);
+        console.log('  Bench:', team.roster.bench);
         
         const { starters, bench } = team.roster;
         
@@ -315,61 +325,88 @@
         let targetLocation = target1Index !== -1 ? 'starters' : 'bench';
         let targetIndex = target1Index !== -1 ? target1Index : target2Index;
         
-        console.log('📍 Source player:', sourceLocation, sourceIndex);
-        console.log('📍 Target player:', targetLocation, targetIndex);
+        console.log('📍 Player positions found:');
+        console.log('  Source in starters:', source1Index);
+        console.log('  Target in starters:', target1Index);
+        console.log('  Source in bench:', source2Index);
+        console.log('  Target in bench:', target2Index);
         
         // Perform swap by creating new arrays
         const newStarters = [...starters];
         const newBench = [...bench];
         
+        let swapDescription = '';
+        
         if (sourceLocation === 'starters' && targetLocation === 'starters') {
           // Both in starters
           newStarters[sourceIndex] = targetPlayerId;
           newStarters[targetIndex] = swapSourcePlayerId;
+          swapDescription = 'Both in Starting 5';
+          console.log('✅ Swapped positions in starters');
         } else if (sourceLocation === 'bench' && targetLocation === 'bench') {
           // Both on bench
           newBench[sourceIndex] = targetPlayerId;
           newBench[targetIndex] = swapSourcePlayerId;
+          swapDescription = 'Both on Bench';
+          console.log('✅ Swapped positions on bench');
         } else if (sourceLocation === 'starters' && targetLocation === 'bench') {
           // Source in starters, target on bench
           newStarters[sourceIndex] = targetPlayerId;
           newBench[targetIndex] = swapSourcePlayerId;
+          swapDescription = 'Starter ↔ Bench';
+          console.log('✅ Moved source to bench, target to starters');
         } else if (sourceLocation === 'bench' && targetLocation === 'starters') {
           // Source on bench, target in starters
           newBench[sourceIndex] = targetPlayerId;
           newStarters[targetIndex] = swapSourcePlayerId;
+          swapDescription = 'Bench ↔ Starter';
+          console.log('✅ Moved source to starters, target to bench');
         }
         
-        console.log('✅ New starters:', newStarters);
-        console.log('✅ New bench:', newBench);
+        console.log('📋 New roster after swap:');
+        console.log('  Starters:', newStarters);
+        console.log('  Bench:', newBench);
         
         // Update team roster
         team.roster = {
           starters: newStarters,
           bench: newBench
         };
+        team.updatedAt = new Date().toISOString();
         
-        // Save to database
+        console.log('💾 Saving to database...');
         await dbManager.save('teams', teamId, team);
         
-        console.log('💾 Saved to database');
+        // Verify save worked
+        const verifyTeam = await dbManager.get('teams', teamId);
+        console.log('🔍 Verification - Roster after save:');
+        console.log('  Starters:', verifyTeam.roster.starters);
+        console.log('  Bench:', verifyTeam.roster.bench);
         
         // Get player names for success message
         const sourcePlayer = await playerManager.getPlayer(swapSourcePlayerId);
         const targetPlayer = await playerManager.getPlayer(targetPlayerId);
         
-        showToast(`✅ Swapped ${sourcePlayer.playerName} ↔️ ${targetPlayer.playerName}`, 'success');
+        showToast(`✅ Swapped ${sourcePlayer.playerName} ↔ ${targetPlayer.playerName}`, 'success');
+        console.log('═══════════════════════════════════════');
+        console.log('✅ SWAP COMPLETED SUCCESSFULLY');
+        console.log('═══════════════════════════════════════');
         
         // Exit swap mode
         exitSwapMode();
         
         // Reload roster
         setTimeout(async () => {
+          console.log('🔄 Reloading page...');
           await loadTeamRoster();
-        }, 800);
+        }, 1200);
         
       } catch (error) {
+        console.error('═══════════════════════════════════════');
         console.error('❌ SWAP ERROR:', error);
+        console.error('Error details:', error.message);
+        console.error('Stack trace:', error.stack);
+        console.error('═══════════════════════════════════════');
         showToast('Swap failed: ' + error.message, 'error');
       } finally {
         hideLoading();
@@ -377,6 +414,8 @@
     }
 
     function exitSwapMode() {
+      console.log('❌ Exiting swap mode');
+      
       isSwapMode = false;
       swapSourcePlayerId = null;
       swapSourcePlayerName = null;
@@ -444,6 +483,7 @@
     }
 
     window.addEventListener('load', async () => {
+      console.log('🏀 Roster view loading...');
       setupCommonElements();
       
       // Get URL parameters
@@ -451,6 +491,8 @@
       teamId = urlParams.get('teamId');
       const swapModeParam = urlParams.get('swapMode');
       const swapPlayerIdParam = urlParams.get('swapPlayerId');
+      
+      console.log('URL params:', { teamId, swapMode: swapModeParam, swapPlayerId: swapPlayerIdParam });
       
       if (!teamId) {
         showToast('No team specified', 'error');
@@ -462,6 +504,8 @@
       if (swapModeParam === 'true' && swapPlayerIdParam) {
         isSwapMode = true;
         swapSourcePlayerId = swapPlayerIdParam;
+        
+        console.log('🔄 SWAP MODE ACTIVATED:', swapSourcePlayerId);
         
         // Get the player's name
         try {
