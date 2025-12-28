@@ -62,10 +62,10 @@
   flex: 1;
   padding: 8px;
   padding-top: 70px; /* Space for badge */
-  gap: 0.5rem;
+  gap: 0.5rem; /* 5% gap between stats and photo (35% + 60% + 5% = 100%) */
 }
 
-/* Left side - stats */
+/* Left side - stats (35%) */
 .player-card-left {
   flex: 0 0 35%;
   display: flex;
@@ -108,7 +108,7 @@
   font-weight: 800;
 }
 
-/* Right side - photo */
+/* Right side - photo (60%) */
 .player-card-right {
   flex: 0 0 60%;
   display: flex;

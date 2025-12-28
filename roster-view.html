@@ -302,7 +302,7 @@
     async function executeSwap(targetPlayerId) {
       // Prevent swapping with self
       if (targetPlayerId === swapSourcePlayerId) {
-        showError('Cannot swap a player with themselves!');
+        showToast('Cannot swap a player with themselves!', 'error');
         return;
       }
       
