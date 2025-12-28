@@ -62,7 +62,7 @@
   flex: 1;
   padding: 8px;
   padding-top: 70px; /* Space for badge */
-  gap: 0.5rem; /* 5% gap between stats and photo (35% + 60% + 5% = 100%) */
+  gap: 0.5rem; /* Gap between stats and photo */
 }
 
 /* Left side - stats (35%) */

@@ -283,22 +283,6 @@
       });
     }
 
-    function handleCardClick(playerId) {
-      if (isSwapMode && swapSourcePlayerId) {
-        // Don't allow swapping with same player
-        if (playerId === swapSourcePlayerId) {
-          showToast('Cannot swap a player with themselves!', 'error');
-          return;
-        }
-        
-        // Execute the swap
-        executeSwap(playerId);
-      } else {
-        // Normal behavior: view player details
-        viewPlayer(playerId);
-      }
-    }
-
     async function executeSwap(targetPlayerId) {
       // Prevent swapping with self
       if (targetPlayerId === swapSourcePlayerId) {
