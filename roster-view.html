@@ -187,46 +187,19 @@
         swapMode.sourcePlayerId = storedSwapPlayerId;
         swapMode.sourcePlayerName = storedSwapPlayerName;
         
-        console.log('🔄 SWAP MODE LOADED FROM SESSION:', swapMode);
+        console.log('═══════════════════════════════════════');
+        console.log('🔄 SWAP MODE ACTIVE');
+        console.log('Source Player ID:', swapMode.sourcePlayerId);
+        console.log('Source Player Name:', swapMode.sourcePlayerName);
+        console.log('═══════════════════════════════════════');
+        
         showSwapBanner();
         return true;
       }
       return false;
     }
 
-    function enterSwapMode(playerId, playerName) {
-      swapMode.active = true;
-      swapMode.sourcePlayerId = playerId;
-      swapMode.sourcePlayerName = playerName;
-      
-      // Store in session
-      sessionStorage.setItem('swapPlayerId', playerId);
-      sessionStorage.setItem('swapPlayerName', playerName);
-      
-      console.log('🔄 ENTERED SWAP MODE:', swapMode);
-      showSwapBanner();
-    }
-
-    function exitSwapMode() {
-      swapMode.active = false;
-      swapMode.sourcePlayerId = null;
-      swapMode.sourcePlayerName = null;
-      
-      // Clear session storage
-      sessionStorage.removeItem('swapPlayerId');
-      sessionStorage.removeItem('swapPlayerName');
-      
-      console.log('❌ EXITED SWAP MODE');
-      
-      // Remove banner
-      const banner = document.querySelector('.swap-mode-banner');
-      if (banner) {
-        banner.remove();
-      }
-    }
-
     function showSwapBanner() {
-      // Remove existing banner
       const existingBanner = document.querySelector('.swap-mode-banner');
       if (existingBanner) {
         existingBanner.remove();
@@ -237,18 +210,16 @@
       banner.innerHTML = `
         <div class="swap-banner-content">
           <div class="swap-banner-text">
-            <span style="font-size: 1.5rem; margin-right: 0.5rem;">🔄</span>
+            <span style="font-size: 1.5rem;">🔄</span>
             <strong>SWAP MODE:</strong>
             <span>Tap another player to swap with <strong>${swapMode.sourcePlayerName}</strong></span>
           </div>
           <button class="btn-cancel-swap" onclick="cancelSwapMode()">
-            <span style="font-size: 1.2rem; margin-right: 0.25rem;">✕</span>
-            Cancel
+            ✕ Cancel
           </button>
         </div>
       `;
       
-      // Insert at top of container
       const container = document.querySelector('.container');
       if (container) {
         container.insertBefore(banner, container.firstChild);
@@ -256,7 +227,20 @@
     }
 
     function cancelSwapMode() {
-      exitSwapMode();
+      swapMode.active = false;
+      swapMode.sourcePlayerId = null;
+      swapMode.sourcePlayerName = null;
+      
+      sessionStorage.removeItem('swapPlayerId');
+      sessionStorage.removeItem('swapPlayerName');
+      
+      console.log('❌ Swap mode cancelled');
+      
+      const banner = document.querySelector('.swap-mode-banner');
+      if (banner) {
+        banner.remove();
+      }
+      
       location.reload();
     }
 
@@ -335,43 +319,32 @@
           const playerName = player.playerName;
           
           if (swapMode.active) {
-            // === SWAP MODE: Execute swap ===
-            console.log('🎯 Player clicked in swap mode:', playerId, playerName);
+            // SWAP MODE
+            console.log('🎯 Player clicked in swap mode:', playerName, playerId);
             
-            // Prevent swapping with self
             if (playerId === swapMode.sourcePlayerId) {
               showToast('Cannot swap a player with themselves!', 'error');
               return;
             }
             
-            // Show confirmation dialog
             const confirmed = confirm(
-              `Swap players?\n\n` +
-              `${swapMode.sourcePlayerName} ↔ ${playerName}\n\n` +
-              `Tap OK to confirm, Cancel to abort.`
+              `Swap players?\n\n${swapMode.sourcePlayerName} ↔ ${playerName}\n\nTap OK to confirm.`
             );
             
             if (confirmed) {
               await performSwap(swapMode.sourcePlayerId, playerId);
             }
-            
           } else {
-            // === NORMAL MODE: View player details ===
+            // NORMAL MODE
             viewPlayer(playerId);
           }
         });
         
         // Visual indicator for swap mode
-        if (swapMode.active) {
-          card.style.cursor = 'pointer';
-          
-          // Highlight the source player
-          if (player.playerId === swapMode.sourcePlayerId) {
-            card.style.opacity = '0.6';
-            card.style.outline = '4px solid #f093fb';
-            card.style.outlineOffset = '4px';
-            card.style.filter = 'brightness(0.8)';
-          }
+        if (swapMode.active && player.playerId === swapMode.sourcePlayerId) {
+          card.style.opacity = '0.6';
+          card.style.outline = '3px solid #f093fb';
+          card.style.outlineOffset = '3px';
         }
         
         card.innerHTML = `
@@ -406,125 +379,117 @@
         showLoading('Swapping players...');
         
         console.log('═══════════════════════════════════════');
-        console.log('🔄 SWAP START');
-        console.log('Player 1 ID:', playerId1);
-        console.log('Player 2 ID:', playerId2);
+        console.log('🔄 PERFORMING SWAP');
+        console.log('Player 1:', playerId1);
+        console.log('Player 2:', playerId2);
         console.log('Team ID:', teamId);
         
-        // 1. Get team from database
+        // Get team from database
         const team = await dbManager.get('teams', teamId);
         
-        if (!team) {
-          throw new Error('Team not found');
+        if (!team || !team.roster) {
+          throw new Error('Team or roster not found');
         }
         
         console.log('📦 Team loaded:', team.teamName);
-        console.log('📋 Current Roster:', team.roster);
+        console.log('📋 Current roster:', JSON.stringify(team.roster, null, 2));
         
-        // 2. Get current starters and bench arrays
-        let starters = team.roster?.starters || [];
-        let bench = team.roster?.bench || [];
+        // Clone arrays
+        const newStarters = [...(team.roster.starters || [])];
+        const newBench = [...(team.roster.bench || [])];
         
         console.log('📍 Before swap:');
-        console.log('  Starters:', starters);
-        console.log('  Bench:', bench);
+        console.log('  Starters:', newStarters);
+        console.log('  Bench:', newBench);
         
-        // 3. Find player locations (simple indexOf)
-        const p1StarterIndex = starters.indexOf(playerId1);
-        const p1BenchIndex = bench.indexOf(playerId1);
-        const p2StarterIndex = starters.indexOf(playerId2);
-        const p2BenchIndex = bench.indexOf(playerId2);
+        // Find positions
+        const p1InStarters = newStarters.indexOf(playerId1);
+        const p1InBench = newBench.indexOf(playerId1);
+        const p2InStarters = newStarters.indexOf(playerId2);
+        const p2InBench = newBench.indexOf(playerId2);
         
-        console.log('📍 Player locations:');
-        console.log('  P1 in starters:', p1StarterIndex);
-        console.log('  P1 in bench:', p1BenchIndex);
-        console.log('  P2 in starters:', p2StarterIndex);
-        console.log('  P2 in bench:', p2BenchIndex);
+        console.log('📍 Positions:');
+        console.log('  P1 in starters:', p1InStarters);
+        console.log('  P1 in bench:', p1InBench);
+        console.log('  P2 in starters:', p2InStarters);
+        console.log('  P2 in bench:', p2InBench);
         
-        // 4. Perform the swap (create new arrays)
-        const newStarters = [...starters];
-        const newBench = [...bench];
-        
-        // Case 1: Both in starters
-        if (p1StarterIndex >= 0 && p2StarterIndex >= 0) {
-          newStarters[p1StarterIndex] = playerId2;
-          newStarters[p2StarterIndex] = playerId1;
-          console.log('✅ Case: Both in starters');
-        }
-        // Case 2: Both in bench
-        else if (p1BenchIndex >= 0 && p2BenchIndex >= 0) {
-          newBench[p1BenchIndex] = playerId2;
-          newBench[p2BenchIndex] = playerId1;
-          console.log('✅ Case: Both in bench');
-        }
-        // Case 3: P1 in starters, P2 in bench
-        else if (p1StarterIndex >= 0 && p2BenchIndex >= 0) {
-          newStarters[p1StarterIndex] = playerId2;
-          newBench[p2BenchIndex] = playerId1;
-          console.log('✅ Case: P1 starter, P2 bench');
-        }
-        // Case 4: P1 in bench, P2 in starters
-        else if (p1BenchIndex >= 0 && p2StarterIndex >= 0) {
-          newBench[p1BenchIndex] = playerId2;
-          newStarters[p2StarterIndex] = playerId1;
-          console.log('✅ Case: P1 bench, P2 starter');
-        }
-        else {
-          throw new Error('Could not find players in roster');
+        // Perform swap
+        if (p1InStarters >= 0 && p2InStarters >= 0) {
+          // Both in starters
+          newStarters[p1InStarters] = playerId2;
+          newStarters[p2InStarters] = playerId1;
+          console.log('✅ Swapped: Both in starters');
+        } else if (p1InBench >= 0 && p2InBench >= 0) {
+          // Both in bench
+          newBench[p1InBench] = playerId2;
+          newBench[p2InBench] = playerId1;
+          console.log('✅ Swapped: Both in bench');
+        } else if (p1InStarters >= 0 && p2InBench >= 0) {
+          // P1 in starters, P2 in bench
+          newStarters[p1InStarters] = playerId2;
+          newBench[p2InBench] = playerId1;
+          console.log('✅ Swapped: P1 starter → bench, P2 bench → starter');
+        } else if (p1InBench >= 0 && p2InStarters >= 0) {
+          // P1 in bench, P2 in starters
+          newBench[p1InBench] = playerId2;
+          newStarters[p2InStarters] = playerId1;
+          console.log('✅ Swapped: P1 bench → starter, P2 starter → bench');
+        } else {
+          throw new Error('Could not find both players in roster');
         }
         
         console.log('📍 After swap:');
-        console.log('  New Starters:', newStarters);
-        console.log('  New Bench:', newBench);
+        console.log('  Starters:', newStarters);
+        console.log('  Bench:', newBench);
         
-        // 5. Update team object
-        team.roster = {
-          starters: newStarters,
-          bench: newBench
-        };
+        // Update team
+        team.roster.starters = newStarters;
+        team.roster.bench = newBench;
         team.updatedAt = new Date().toISOString();
         
-        console.log('💾 Saving updated team to database...');
+        console.log('💾 Saving to database...');
         
-        // 6. Save to database
-        await dbManager.save('teams', teamId, team);
+        // Save to database
+        const saveResult = await dbManager.save('teams', teamId, team);
+        console.log('💾 Save result:', saveResult);
         
-        console.log('✅ Database save complete');
-        
-        // 7. Verify the save
+        // Verify
         const verifyTeam = await dbManager.get('teams', teamId);
-        console.log('🔍 VERIFICATION - Team after save:');
+        console.log('🔍 Verification:');
         console.log('  Starters:', verifyTeam.roster.starters);
         console.log('  Bench:', verifyTeam.roster.bench);
         
-        // 8. Get player names for success message
+        // Get player names
         const player1 = await playerManager.getPlayer(playerId1);
         const player2 = await playerManager.getPlayer(playerId2);
         
         console.log('═══════════════════════════════════════');
-        console.log('✅ SWAP COMPLETED SUCCESSFULLY');
+        console.log('✅ SWAP COMPLETE');
         console.log(`   ${player1.playerName} ↔ ${player2.playerName}`);
         console.log('═══════════════════════════════════════');
         
         showToast(`✅ Swapped ${player1.playerName} ↔ ${player2.playerName}`, 'success');
         
-        // 9. Exit swap mode
-        exitSwapMode();
+        // Clear swap mode
+        sessionStorage.removeItem('swapPlayerId');
+        sessionStorage.removeItem('swapPlayerName');
         
-        // 10. Reload page after brief delay
+        // Reload
         setTimeout(() => {
-          console.log('🔄 Reloading page to show changes...');
+          console.log('🔄 Reloading page...');
           window.location.reload();
         }, 1500);
         
       } catch (error) {
         console.error('═══════════════════════════════════════');
         console.error('❌ SWAP FAILED');
-        console.error('Error:', error.message);
+        console.error('Error:', error);
         console.error('Stack:', error.stack);
         console.error('═══════════════════════════════════════');
         
         showToast('Swap failed: ' + error.message, 'error');
+      } finally {
         hideLoading();
       }
     }
