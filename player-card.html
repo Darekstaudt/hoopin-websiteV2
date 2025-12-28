@@ -58,206 +58,80 @@
         border-radius: 0;
         box-shadow: none;
         display: block;
+        background: var(--bg-secondary, #132f4c);
       }
 
-      .player-detail-card .card {
+      .player-detail-card .player-card {
         width: 100%;
         max-width: 100%;
         margin: 0;
-        padding: 0;
+        padding: 1rem;
         border-radius: 0;
         border: none;
         display: block;
         background: var(--bg-secondary, #132f4c);
       }
 
-      /* All sections full width */
-      .player-header {
+      /* Player photo - centered and properly sized */
+      .player-photo {
         width: 100%;
-        padding: 1rem;
-        margin: 0;
-      }
-
-      .player-photo-section {
-        width: 100%;
-        padding: 1.5rem 1rem;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .player-photo-section img {
         max-width: 280px;
-        max-height: 280px;
+        height: auto;
+        margin: 0 auto;
+        display: block;
         border-radius: 12px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
       }
 
-      .player-info-section {
+      /* Ensure all child elements have proper padding */
+      .player-card > * {
         width: 100%;
-        padding: 1rem;
-        margin: 0;
+        box-sizing: border-box;
       }
 
-      .player-stats-section,
-      .player-cap-breakers-section {
-        width: 100%;
-        padding: 1.5rem 1rem;
-        margin: 0;
-        background: rgba(0, 0, 0, 0.2);
-      }
-
-      .player-stats-section h3,
-      .player-cap-breakers-section h3 {
-        margin: 0 0 1rem 0;
-        font-size: 1.25rem;
-        color: var(--text-primary, #fff);
-      }
-
-      /* Stat bars - full width */
-      .stat-bars-grid {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .stat-bar {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      .stat-bar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--text-primary, #fff);
-      }
-
-      .stat-bar-fill-container {
-        width: 100%;
-        height: 32px;
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 8px;
-        overflow: hidden;
-        position: relative;
-      }
-
-      .stat-bar-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--color-primary, #3b82f6), var(--color-secondary, #8b5cf6));
-        border-radius: 8px;
-        transition: width 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        padding-right: 8px;
-        color: white;
-        font-weight: 700;
-        font-size: 0.875rem;
-      }
-
-      /* Cap breakers */
-      .cap-breakers-grid {
-        width: 100%;
+      /* Stats grid responsive */
+      .player-stats {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-      }
-
-      .cap-breaker-item {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 1rem;
-        border-radius: 8px;
-        border-left: 4px solid var(--color-accent, #10b981);
-      }
-
-      .cap-breaker-label {
-        font-size: 0.875rem;
-        color: var(--text-muted, #94a3b8);
-        margin-bottom: 0.25rem;
-      }
-
-      .cap-breaker-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--color-accent, #10b981);
-      }
-
-      /* Action buttons */
-      .player-actions {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
         width: 100%;
-        padding: 1.5rem 1rem;
-        margin: 0;
+        margin: 1.5rem 0;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 0.75rem 0.5rem;
+      }
+
+      /* Tier badge mobile styling */
+      .tier-badge {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        align-items: center;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 12px;
       }
 
-      .player-actions .btn {
+      /* Buttons full width on mobile */
+      .player-card button {
         width: 100%;
         padding: 1rem;
         font-size: 1rem;
-        font-weight: 600;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Action buttons container */
+      .player-card > div:last-child {
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column;
         gap: 0.5rem;
-        transition: all 0.2s;
+        width: 100%;
       }
 
-      .btn-primary {
-        background: var(--color-primary, #3b82f6);
-        color: white;
-      }
-
-      .btn-secondary {
-        background: var(--color-secondary, #8b5cf6);
-        color: white;
-      }
-
-      .btn-accent {
-        background: var(--color-accent, #10b981);
-        color: white;
-      }
-
-      .btn-danger {
-        background: #ef4444;
-        color: white;
-      }
-
-      .btn:active {
-        transform: scale(0.98);
-      }
-
-      /* Tier badge */
-      .tier-badge {
-        display: inline-block;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-top: 0.5rem;
-      }
-
-      .overall-display {
-        font-size: 3rem;
-        font-weight: 900;
-        color: var(--text-primary, #fff);
-        text-align: center;
-        margin: 0.5rem 0;
-        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      .player-card > div:last-child button {
+        flex: 1;
+        min-width: auto;
       }
     }
 
@@ -468,23 +342,80 @@
       }
       
       console.log('═══════════════════════════════════════');
-      console.log('🔄 INITIATING SWAP');
+      console.log('🔄 INITIATING SWAP MODE');
       console.log('Player:', currentPlayer.playerName, currentPlayer.playerId);
       console.log('Team:', currentPlayer.teamId);
-      console.log('═══════════════════════════════════════');
       
-      // Store in session
+      // Need to find player's current position
+      // Store player info in session
       sessionStorage.setItem('swapPlayerId', currentPlayer.playerId);
       sessionStorage.setItem('swapPlayerName', currentPlayer.playerName);
       
-      console.log('💾 Stored in session storage');
-      console.log('  swapPlayerId:', currentPlayer.playerId);
-      console.log('  swapPlayerName:', currentPlayer.playerName);
-      
-      // Navigate to roster
-      navigateToPage('roster-view.html', { 
-        teamId: currentPlayer.teamId
-      });
+      // Find current position (will be determined in roster view)
+      findPlayerPositionAndNavigate();
+    }
+
+    async function findPlayerPositionAndNavigate() {
+      try {
+        showLoading('Loading...');
+        
+        // Get team roster
+        const team = await dbManager.get('teams', currentPlayer.teamId);
+        
+        if (!team || !team.roster) {
+          throw new Error('Team roster not found');
+        }
+        
+        // Migrate if needed
+        let roster = team.roster;
+        if (!roster.positions) {
+          console.log('🔄 Migrating roster...');
+          const migratedTeam = await migrateRosterToPositions(currentPlayer.teamId);
+          roster = migratedTeam.roster;
+        }
+        
+        // Find player position
+        let position = null;
+        
+        // Check positions
+        for (const [pos, playerId] of Object.entries(roster.positions)) {
+          if (playerId === currentPlayer.playerId) {
+            position = pos;
+            break;
+          }
+        }
+        
+        // Check bench
+        if (!position) {
+          const benchIdx = roster.bench.indexOf(currentPlayer.playerId);
+          if (benchIdx >= 0) {
+            position = `bench-${benchIdx}`;
+          }
+        }
+        
+        if (!position) {
+          throw new Error('Player not found in roster');
+        }
+        
+        console.log('📍 Current position:', position);
+        
+        // Store position
+        sessionStorage.setItem('swapPosition', position);
+        
+        console.log('💾 Stored swap data in session');
+        console.log('═══════════════════════════════════════');
+        
+        // Navigate
+        navigateToPage('roster-view.html', { 
+          teamId: currentPlayer.teamId
+        });
+        
+      } catch (error) {
+        console.error('❌ Error initiating swap:', error);
+        showToast('Could not start swap: ' + error.message, 'error');
+      } finally {
+        hideLoading();
+      }
     }
 
     async function sharePlayer() {
