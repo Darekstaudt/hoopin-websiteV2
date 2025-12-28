@@ -13,96 +13,41 @@
   <link rel="stylesheet" href="css/animations.css">
   
   <style>
-    /* Reset all containers to full width on mobile */
-    body {
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-
-    .container {
-      padding: 0;
-      margin: 0;
-      max-width: 100%;
-      width: 100%;
-    }
-
-    .player-detail-container {
-      width: 100%;
-      padding: 0;
-      margin: 0;
-    }
-
-    .player-detail-card {
-      width: 100%;
-      margin: 0;
-      border-radius: 0;
-      box-shadow: none;
-    }
-
-    /* Ensure card content is full width */
-    .player-detail-card .card {
-      margin: 0;
-      border-radius: 0;
-      width: 100%;
-    }
-
-    .player-header,
-    .player-photo-section,
-    .player-stats-section,
-    .player-cap-breakers-section,
-    .player-actions {
-      width: 100%;
-      margin: 0;
-    }
-
-    /* Desktop: Keep centered with max width */
-    @media (min-width: 769px) {
-      body {
-        padding: 1rem;
-      }
-
-      .container {
-        padding: 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-
-      .player-detail-card {
-        max-width: 600px;
-        margin: 2rem auto;
-        border-radius: var(--radius-lg);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      }
-
-      .player-detail-card .card {
-        border-radius: var(--radius-lg);
-      }
-    }
-
-    /* Mobile: Force full viewport width */
+    /* === MOBILE: Full-Screen Overlay === */
     @media (max-width: 768px) {
       body, html {
-        padding: 0 !important;
         margin: 0 !important;
-        width: 100vw !important;
+        padding: 0 !important;
         overflow-x: hidden !important;
+        width: 100vw !important;
+        height: 100vh !important;
       }
-
+      
+      /* Make container a fixed full-screen overlay */
       .container {
-        padding: 0 !important;
-        margin: 0 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
         width: 100vw !important;
+        height: 100vh !important;
         max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        background: var(--bg-primary, #0a1929) !important;
       }
-
+      
       .player-detail-container {
-        padding: 0 !important;
-        margin: 0 !important;
         width: 100vw !important;
         max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: 100vh !important;
       }
-
+      
       .player-detail-card {
         width: 100vw !important;
         max-width: 100vw !important;
@@ -110,23 +55,86 @@
         padding: 0 !important;
         border-radius: 0 !important;
         box-shadow: none !important;
+        min-height: 100vh !important;
       }
-
+      
       .player-detail-card .card {
         width: 100vw !important;
         max-width: 100vw !important;
-        border-radius: 0 !important;
         margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
       }
-
+      
+      /* Sections full width */
       .player-header,
       .player-photo-section,
+      .player-info-section,
       .player-stats-section,
-      .player-cap-breakers-section {
+      .player-cap-breakers-section,
+      .player-actions {
         width: 100% !important;
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        box-sizing: border-box !important;
       }
+      
+      /* Stats bars full width */
+      .stat-bar,
+      .cap-breaker-bar {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
+    
+    /* === DESKTOP: Centered Card === */
+    @media (min-width: 769px) {
+      body {
+        padding: 1rem;
+        background: var(--bg-primary, #0a1929);
+      }
+      
+      .container {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      
+      .player-detail-card {
+        max-width: 600px;
+        margin: 2rem auto;
+        border-radius: var(--radius-lg, 12px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      
+      .player-detail-card .card {
+        border-radius: var(--radius-lg, 12px);
+      }
+    }
+    
+    /* === COMMON STYLES === */
+    .player-detail-card {
+      background: var(--bg-secondary, #132f4c);
+      overflow: hidden;
+    }
+    
+    .player-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding-top: 1rem;
+      padding-bottom: 1.5rem;
+    }
+    
+    .player-actions .btn {
+      flex: 1;
+      min-width: 120px;
+      max-width: 200px;
     }
   </style>
   
@@ -250,8 +258,8 @@
 
     function initiateSwap() {
       if (!currentPlayer) {
-        console.error('❌ No current player for swap');
-        showToast('Cannot initiate swap - player not loaded', 'error');
+        console.error('❌ No current player loaded');
+        showToast('Cannot start swap - player not loaded', 'error');
         return;
       }
       
@@ -262,11 +270,15 @@
       console.log('Team ID:', currentPlayer.teamId);
       console.log('═══════════════════════════════════════');
       
-      // Navigate to roster view with swap parameters
+      // Store in session storage
+      sessionStorage.setItem('swapPlayerId', currentPlayer.playerId);
+      sessionStorage.setItem('swapPlayerName', currentPlayer.playerName);
+      
+      console.log('💾 Stored in session storage');
+      
+      // Navigate to roster view (swap mode will be detected automatically)
       navigateToPage('roster-view.html', { 
-        teamId: currentPlayer.teamId,
-        swapMode: 'true',
-        swapPlayerId: currentPlayer.playerId
+        teamId: currentPlayer.teamId
       });
     }
 
