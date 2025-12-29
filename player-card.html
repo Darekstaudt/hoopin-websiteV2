@@ -345,77 +345,18 @@
       console.log('🔄 INITIATING SWAP MODE');
       console.log('Player:', currentPlayer.playerName, currentPlayer.playerId);
       console.log('Team:', currentPlayer.teamId);
+      console.log('═══════════════════════════════════════');
       
-      // Need to find player's current position
-      // Store player info in session
+      // Store in session storage
       sessionStorage.setItem('swapPlayerId', currentPlayer.playerId);
       sessionStorage.setItem('swapPlayerName', currentPlayer.playerName);
       
-      // Find current position (will be determined in roster view)
-      findPlayerPositionAndNavigate();
-    }
-
-    async function findPlayerPositionAndNavigate() {
-      try {
-        showLoading('Loading...');
-        
-        // Get team roster
-        const team = await dbManager.get('teams', currentPlayer.teamId);
-        
-        if (!team || !team.roster) {
-          throw new Error('Team roster not found');
-        }
-        
-        // Migrate if needed
-        let roster = team.roster;
-        if (!roster.positions) {
-          console.log('🔄 Migrating roster...');
-          const migratedTeam = await migrateRosterToPositions(currentPlayer.teamId);
-          roster = migratedTeam.roster;
-        }
-        
-        // Find player position
-        let position = null;
-        
-        // Check positions
-        for (const [pos, playerId] of Object.entries(roster.positions)) {
-          if (playerId === currentPlayer.playerId) {
-            position = pos;
-            break;
-          }
-        }
-        
-        // Check bench
-        if (!position) {
-          const benchIdx = roster.bench.indexOf(currentPlayer.playerId);
-          if (benchIdx >= 0) {
-            position = `bench-${benchIdx}`;
-          }
-        }
-        
-        if (!position) {
-          throw new Error('Player not found in roster');
-        }
-        
-        console.log('📍 Current position:', position);
-        
-        // Store position
-        sessionStorage.setItem('swapPosition', position);
-        
-        console.log('💾 Stored swap data in session');
-        console.log('═══════════════════════════════════════');
-        
-        // Navigate
-        navigateToPage('roster-view.html', { 
-          teamId: currentPlayer.teamId
-        });
-        
-      } catch (error) {
-        console.error('❌ Error initiating swap:', error);
-        showToast('Could not start swap: ' + error.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      console.log('💾 Stored in session storage');
+      
+      // Navigate to roster
+      navigateToPage('roster-view.html', { 
+        teamId: currentPlayer.teamId
+      });
     }
 
     async function sharePlayer() {
