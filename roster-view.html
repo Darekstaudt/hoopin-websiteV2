@@ -422,11 +422,13 @@
           await dbManager.save('teams', teamId, currentTeam);
           
           console.log('✅ Migration complete. New roster:', currentTeam.roster);
-        } else if (!currentTeam.roster.starters) {
-          // Ensure starters array exists
-          currentTeam.roster.starters = currentTeam.roster.starters || [];
-          currentTeam.roster.bench = currentTeam.roster.bench || [];
-          await dbManager.save('teams', teamId, currentTeam);
+        } else {
+          // Ensure arrays exist
+          if (!currentTeam.roster.starters || !currentTeam.roster.bench) {
+            currentTeam.roster.starters = currentTeam.roster.starters || [];
+            currentTeam.roster.bench = currentTeam.roster.bench || [];
+            await dbManager.save('teams', teamId, currentTeam);
+          }
         }
         
         // Update team name
@@ -675,15 +677,10 @@
           updatedAt: team.updatedAt
         });
         
-        // Step 6: Save to database with explicit write
+        // Step 6: Save to database
         console.log('💾 Step 6: Saving to database...');
-        
-        // Try multiple save methods to ensure it persists
         await dbManager.save('teams', teamId, team);
-        console.log('✅ Save method 1 complete (dbManager.save)');
-        
-        // Force a small delay to ensure IndexedDB commits
-        await new Promise(resolve => setTimeout(resolve, 100));
+        console.log('✅ Save complete (dbManager.save)');
         
         // Step 7: Verify the save worked
         console.log('🔍 Step 7: Verifying save...');
