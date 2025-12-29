@@ -392,9 +392,40 @@
         console.log('📦 Team loaded:', currentTeam.teamName);
         console.log('📋 Roster structure:', JSON.stringify(currentTeam.roster, null, 2));
         
-        // Ensure roster structure exists with array format
-        if (!currentTeam.roster || !currentTeam.roster.starters) {
+        // Handle roster format migration
+        if (!currentTeam.roster) {
+          // No roster - create new one
           currentTeam.roster = { starters: [], bench: [] };
+          await dbManager.save('teams', teamId, currentTeam);
+        } else if (currentTeam.roster.positions) {
+          // Old position-based format - migrate back to array format
+          console.log('🔄 Migrating from position-based to array-based format...');
+          const positions = currentTeam.roster.positions;
+          const oldBench = currentTeam.roster.bench || [];
+          
+          // Convert positions to starters array
+          const starters = [
+            positions.PG,
+            positions.SG,
+            positions.SF,
+            positions.PF,
+            positions.C
+          ].filter(id => id !== null && id !== undefined);
+          
+          // Filter bench to remove nulls
+          const bench = oldBench.filter(id => id !== null && id !== undefined);
+          
+          currentTeam.roster = { starters, bench };
+          currentTeam.rosterFormat = 'arrays'; // Mark as migrated
+          currentTeam.migratedAt = new Date().toISOString();
+          
+          await dbManager.save('teams', teamId, currentTeam);
+          
+          console.log('✅ Migration complete. New roster:', currentTeam.roster);
+        } else if (!currentTeam.roster.starters) {
+          // Ensure starters array exists
+          currentTeam.roster.starters = currentTeam.roster.starters || [];
+          currentTeam.roster.bench = currentTeam.roster.bench || [];
           await dbManager.save('teams', teamId, currentTeam);
         }
         
