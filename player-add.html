@@ -588,18 +588,21 @@
         
         // Check if already in roster
         if (team.roster.starters && team.roster.starters.includes(playerId)) {
-          showError('Player already in Starting 5');
+          showToast('Player already in Starting 5', 'error');
+          hideLoading();
           return;
         }
         
         if (team.roster.bench && team.roster.bench.includes(playerId)) {
-          showError('Player already on Bench');
+          showToast('Player already on Bench', 'error');
+          hideLoading();
           return;
         }
         
         // Check starters limit
         if (team.roster.starters && team.roster.starters.length >= 5) {
-          showError('Starting 5 is full!');
+          showToast('Starting 5 is full!', 'error');
+          hideLoading();
           return;
         }
         
@@ -652,12 +655,14 @@
         
         // Check if already in roster
         if (team.roster.starters && team.roster.starters.includes(playerId)) {
-          showError('Player already in Starting 5');
+          showToast('Player already in Starting 5', 'error');
+          hideLoading();
           return;
         }
         
         if (team.roster.bench && team.roster.bench.includes(playerId)) {
-          showError('Player already on Bench');
+          showToast('Player already on Bench', 'error');
+          hideLoading();
           return;
         }
         
