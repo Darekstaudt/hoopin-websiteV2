@@ -543,7 +543,13 @@
         text-align: center;
         margin: 0 0 1.5rem 0;
       `;
-      message.innerHTML = `Where would you like to add <strong>${sanitizeHTML(playerName)}</strong>?`;
+      const messageText1 = document.createTextNode('Where would you like to add ');
+      const strongElement = document.createElement('strong');
+      strongElement.textContent = playerName;
+      const messageText2 = document.createTextNode('?');
+      message.appendChild(messageText1);
+      message.appendChild(strongElement);
+      message.appendChild(messageText2);
       
       const buttonContainer = document.createElement('div');
       buttonContainer.style.cssText = 'display: flex; flex-direction: column; gap: 0.75rem;';
