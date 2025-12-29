@@ -14,17 +14,66 @@
   <link rel="stylesheet" href="css/animations.css">
   
   <style>
-/* Team Header */
-.team-header {
-  margin-bottom: 2rem;
+/* Team Info Card */
+.team-info-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.team-header h1 {
-  font-size: 2rem;
+.team-info-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.team-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.team-info-text {
+  flex: 1;
+}
+
+.team-name-title {
+  font-size: 1.75rem;
   font-weight: 800;
   color: var(--text-primary, #fff);
-  margin-bottom: 1rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.team-manager {
+  font-size: 0.95rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.team-info-right {
+  display: flex;
+  align-items: center;
+}
+
+.division-badge {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.25rem;
   text-align: center;
+  min-width: 80px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .team-stats {
@@ -101,39 +150,268 @@
 }
 
 @media (max-width: 768px) {
+  .team-info-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .team-info-left {
+    width: 100%;
+  }
+  
+  .team-logo {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .team-name-title {
+    font-size: 1.5rem;
+  }
+  
+  .team-info-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .bench-container {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Player Cards */
+/* Player Cards - Matching Screenshots Exactly */
 .player-card {
-  min-width: 220px;
-  max-width: 220px;
-  aspect-ratio: 2/3;
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(239, 68, 68, 0.2) 100%);
+  border: 3px solid rgba(236, 72, 153, 0.6);
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  scroll-snap-align: start;
+  transition: all 0.3s ease;
   position: relative;
-}
-
-.bench-container .player-card {
-  min-width: auto;
-  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 280px;
+  max-width: 280px;
+  scroll-snap-align: start;
 }
 
 .player-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 32px rgba(236, 72, 153, 0.5);
+  border-color: rgba(236, 72, 153, 0.9);
+}
+
+/* Tier-specific backgrounds (matching screenshots) */
+.player-card.pin-tier {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.4) 0%, rgba(219, 39, 119, 0.3) 100%);
+  border-color: rgba(236, 72, 153, 0.8);
+}
+
+.player-card.bronze-tier,
+.player-card.tier-bronze {
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.4) 0%, rgba(92, 40, 11, 0.3) 100%);
+  border-color: rgba(180, 83, 9, 0.8);
+}
+
+.player-card.silver-tier,
+.player-card.tier-silver {
+  background: linear-gradient(135deg, rgba(156, 163, 175, 0.4) 0%, rgba(107, 114, 128, 0.3) 100%);
+  border-color: rgba(156, 163, 175, 0.8);
+}
+
+.player-card.gold-tier,
+.player-card.tier-gold {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.4) 0%, rgba(202, 138, 4, 0.3) 100%);
+  border-color: rgba(234, 179, 8, 0.8);
+}
+
+.player-card.emerald-tier,
+.player-card.tier-emerald {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.4) 0%, rgba(5, 150, 105, 0.3) 100%);
+  border-color: rgba(16, 185, 129, 0.8);
+}
+
+.player-card.sapphire-tier,
+.player-card.tier-sapphire {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(37, 99, 235, 0.3) 100%);
+  border-color: rgba(59, 130, 246, 0.8);
+}
+
+.player-card.ruby-tier,
+.player-card.tier-ruby {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.4) 0%, rgba(185, 28, 28, 0.3) 100%);
+  border-color: rgba(220, 38, 38, 0.8);
+}
+
+.player-card.amethyst-tier,
+.player-card.tier-amethyst {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.4) 0%, rgba(139, 92, 246, 0.3) 100%);
+  border-color: rgba(167, 139, 250, 0.8);
+}
+
+.player-card.diamond-tier,
+.player-card.tier-diamond {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.4) 0%, rgba(59, 130, 246, 0.3) 100%);
+  border-color: rgba(96, 165, 250, 0.8);
+}
+
+.player-card.pink-diamond-tier,
+.player-card.tier-pink-diamond {
+  background: linear-gradient(135deg, rgba(244, 114, 182, 0.4) 0%, rgba(236, 72, 153, 0.3) 100%);
+  border-color: rgba(244, 114, 182, 0.8);
+}
+
+.player-card.galaxy-opal-tier,
+.player-card.tier-galaxy-opal {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.5) 0%, rgba(139, 92, 246, 0.4) 100%);
+  border-color: rgba(167, 139, 250, 0.9);
+}
+
+.player-card.dark-matter-tier,
+.player-card.tier-dark-matter {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.6) 0%, rgba(124, 58, 237, 0.5) 100%);
+  border-color: rgba(139, 92, 246, 1);
+}
+
+/* Player Card Header - Overall Badge */
+.player-card-header {
+  padding: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.player-card-overall {
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 0.5rem 0.75rem;
+  min-width: 70px;
+  text-align: center;
+}
+
+.overall-number {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.overall-tier {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Player Card Content - Stats LEFT, Photo RIGHT */
+.player-card-content {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 0.75rem 0.75rem 0.75rem;
+  flex: 1;
+}
+
+/* Stats on LEFT side */
+.player-card-stats {
+  flex: 0 0 45%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  justify-content: center;
+}
+
+.stat-line {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.stat-line strong {
+  font-weight: 800;
+  margin-right: 4px;
+}
+
+/* Photo on RIGHT side */
+.player-card-photo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+  min-height: 200px;
+}
+
+.player-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.player-icon-placeholder {
+  font-size: 4rem;
+  opacity: 0.4;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Player Card Footer - Name */
+.player-card-footer {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.player-name {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Bench cards - slightly smaller */
+.bench-container .player-card {
+  min-width: 240px;
+  max-width: 100%;
+}
+
+.bench-container .player-card-photo {
+  min-height: 160px;
+}
+
+.bench-container .stat-line {
+  font-size: 0.8rem;
+}
+
+.bench-container .overall-number {
+  font-size: 1.75rem;
 }
 
 /* Swap mode styling */
 .player-card.swap-source {
-  opacity: 0.6;
-  outline: 3px solid #f093fb;
+  opacity: 0.65;
+  outline: 4px solid #f093fb;
   outline-offset: 4px;
+  animation: swapPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes swapPulse {
+  0%, 100% {
+    outline-color: #f093fb;
+  }
+  50% {
+    outline-color: #f5576c;
+  }
 }
 
 /* Swap Mode Banner */
@@ -246,25 +524,37 @@
   <div class="container page-transition">
     <!-- Swap banner will be inserted here -->
     
-    <div class="team-header">
-      <h1 id="teamName">Team Roster</h1>
-      <div class="team-stats">
-        <div class="stat-card">
-          <div class="stat-value" id="totalPlayers">0</div>
-          <div class="stat-label">Players</div>
+    <!-- Team Info Card -->
+    <div class="team-info-card" id="teamInfoCard">
+      <div class="team-info-left">
+        <img id="teamLogo" class="team-logo" src="" alt="Team Logo">
+        <div class="team-info-text">
+          <h1 id="teamName" class="team-name-title">Team Roster</h1>
+          <div id="teamManager" class="team-manager">Manager: </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" id="avgOverall">0</div>
-          <div class="stat-label">Avg OVR</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="startersCount">0/5</div>
-          <div class="stat-label">Starters</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="benchCount">0</div>
-          <div class="stat-label">Bench</div>
-        </div>
+      </div>
+      <div class="team-info-right">
+        <div id="teamDivision" class="division-badge"></div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="team-stats">
+      <div class="stat-card">
+        <div class="stat-value" id="totalPlayers">0</div>
+        <div class="stat-label">Players</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="avgOverall">0</div>
+        <div class="stat-label">Avg OVR</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="startersCount">0/5</div>
+        <div class="stat-label">Starters</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="benchCount">0</div>
+        <div class="stat-label">Bench</div>
       </div>
     </div>
 
@@ -382,7 +672,7 @@
         
         console.log('📋 Loading roster for team:', teamId);
         
-        // Get team
+        // Get team with force refresh
         currentTeam = await dbManager.get('teams', teamId);
         
         if (!currentTeam) {
@@ -390,11 +680,11 @@
         }
         
         console.log('📦 Team loaded:', currentTeam.teamName);
-        console.log('📋 Roster structure:', JSON.stringify(currentTeam.roster, null, 2));
+        console.log('📋 Roster:', currentTeam.roster);
         
-        // Handle roster format migration
+        // Ensure roster structure exists
         if (!currentTeam.roster) {
-          // No roster - create new one
+          console.log('⚠️ No roster found, creating empty roster');
           currentTeam.roster = { starters: [], bench: [] };
           await dbManager.save('teams', teamId, currentTeam);
         } else if (currentTeam.roster.positions) {
@@ -416,7 +706,7 @@
           const bench = oldBench.filter(id => id !== null && id !== undefined);
           
           currentTeam.roster = { starters, bench };
-          currentTeam.rosterFormat = 'arrays'; // Mark as migrated
+          currentTeam.rosterFormat = 'arrays';
           currentTeam.migratedAt = new Date().toISOString();
           
           await dbManager.save('teams', teamId, currentTeam);
@@ -431,12 +721,18 @@
           }
         }
         
-        // Update team name
-        document.getElementById('teamName').textContent = currentTeam.teamName;
+        // Populate team info card
+        populateTeamInfo(currentTeam);
         
         // Render starters and bench
-        await renderStarters(currentTeam.roster.starters || []);
-        await renderBench(currentTeam.roster.bench || []);
+        const starters = currentTeam.roster.starters || [];
+        const bench = currentTeam.roster.bench || [];
+        
+        console.log('📊 Rendering starters:', starters.length);
+        console.log('📊 Rendering bench:', bench.length);
+        
+        await renderStarters(starters);
+        await renderBench(bench);
         
         // Update stats
         updateRosterStats();
@@ -446,6 +742,39 @@
         showToast('Failed to load roster: ' + error.message, 'error');
       } finally {
         hideLoading();
+      }
+    }
+
+    // Populate team info card
+    function populateTeamInfo(team) {
+      // Team name
+      document.getElementById('teamName').textContent = team.teamName;
+      
+      // Team logo
+      const logoImg = document.getElementById('teamLogo');
+      if (team.teamLogo) {
+        logoImg.src = team.teamLogo;
+        logoImg.style.display = 'block';
+      } else {
+        logoImg.style.display = 'none';
+      }
+      
+      // Manager
+      const managerEl = document.getElementById('teamManager');
+      if (team.manager) {
+        managerEl.textContent = `Manager: ${team.manager}`;
+        managerEl.style.display = 'block';
+      } else {
+        managerEl.style.display = 'none';
+      }
+      
+      // Division badge
+      const divisionEl = document.getElementById('teamDivision');
+      if (team.division) {
+        divisionEl.textContent = team.division;
+        divisionEl.style.display = 'block';
+      } else {
+        divisionEl.style.display = 'none';
       }
     }
 
@@ -514,27 +843,33 @@
         card.classList.add('swap-source');
       }
       
+      // Card structure matching screenshots - stats on LEFT, photo on RIGHT
       card.innerHTML = `
-        <div class="player-card-overall-badge">
-          <div class="overall-number">${player.overall}</div>
-        </div>
-        <div class="player-card-body">
-          <div class="player-card-stats-side">
-            <div class="stat-line-compact"><strong>Face:</strong> ${player.stats.face}</div>
-            <div class="stat-line-compact"><strong>Eyes:</strong> ${player.stats.eyes}</div>
-            <div class="stat-line-compact"><strong>Top:</strong> ${player.stats.top}</div>
-            <div class="stat-line-compact"><strong>Bottom:</strong> ${player.stats.bottom}</div>
-            <div class="stat-line-compact"><strong>Fitness:</strong> ${player.stats.fitness}</div>
-            <div class="stat-line-compact"><strong>Personality:</strong> ${player.stats.personality}</div>
+        <div class="player-card-header">
+          <div class="player-card-overall">
+            <div class="overall-number">${player.overall}</div>
+            ${player.tier ? `<div class="overall-tier">${player.tier}</div>` : ''}
           </div>
-          <div class="player-card-photo-side">
+        </div>
+        <div class="player-card-content">
+          <div class="player-card-stats">
+            <div class="stat-line"><strong>Face:</strong> ${player.stats.face || 0}</div>
+            <div class="stat-line"><strong>Eyes:</strong> ${player.stats.eyes || 0}</div>
+            <div class="stat-line"><strong>Top:</strong> ${player.stats.top || 0}</div>
+            <div class="stat-line"><strong>Bottom:</strong> ${player.stats.bottom || 0}</div>
+            <div class="stat-line"><strong>Fitness:</strong> ${player.stats.fitness || 0}</div>
+            <div class="stat-line"><strong>Person:</strong> ${player.stats.personality || 0}</div>
+          </div>
+          <div class="player-card-photo">
             ${player.playerPhoto 
-              ? `<img src="${player.playerPhoto}" alt="${player.playerName}">`
-              : '<div class="player-icon-large">👤</div>'
+              ? `<img src="${player.playerPhoto}" alt="${player.playerName}" />`
+              : '<div class="player-icon-placeholder">👤</div>'
             }
           </div>
         </div>
-        <div class="player-card-name-bar">${sanitizeHTML(player.playerName)}</div>
+        <div class="player-card-footer">
+          <div class="player-name">${sanitizeHTML(player.playerName)}</div>
+        </div>
       `;
       
       // Add click handler
@@ -851,6 +1186,22 @@
       
       // Load roster
       await loadRoster();
+    });
+
+    // Listen for page visibility changes (user returns to roster view)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && teamId) {
+        console.log('👁️ Page visible again, reloading roster...');
+        loadRoster();
+      }
+    });
+
+    // Also listen for focus event
+    window.addEventListener('focus', () => {
+      if (teamId) {
+        console.log('🎯 Window focused, reloading roster...');
+        loadRoster();
+      }
     });
   </script>
 </body>

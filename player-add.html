@@ -461,21 +461,36 @@
         let result;
         if (isEditing) {
           result = await playerManager.updatePlayer(editingPlayerId, playerData);
+          hideLoading();
+
+          if (result.success) {
+            showToast('Player updated!', 'success');
+            session.remove('playerDraft');
+            
+            setTimeout(() => {
+              navigateToPage('roster-view.html', { teamId: teamId });
+            }, 1000);
+          } else {
+            throw new Error(result.error);
+          }
         } else {
+          // Create new player
           result = await playerManager.createPlayer(playerData);
-        }
-
-        hideLoading();
-
-        if (result.success) {
-          showToast(isEditing ? 'Player updated!' : 'Player added!', 'success');
-          session.remove('playerDraft');
           
-          setTimeout(() => {
-            navigateToPage('roster-view.html', { teamId: teamId });
-          }, 1000);
-        } else {
-          throw new Error(result.error);
+          if (result.success) {
+            session.remove('playerDraft');
+            
+            // Store the created player ID temporarily
+            const createdPlayerId = result.player.playerId;
+            const createdPlayerName = result.player.playerName;
+            
+            hideLoading();
+            
+            // Show modal to choose where to add player
+            showAddToRosterModal(createdPlayerId, createdPlayerName);
+          } else {
+            throw new Error(result.error);
+          }
         }
       } catch (error) {
         hideLoading();
@@ -484,6 +499,233 @@
         submitBtn.disabled = false;
         submitBtn.textContent = isEditing ? 'Update Player' : 'Save Player';
       }
+    }
+
+    function showAddToRosterModal(playerId, playerName) {
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 1rem;
+      `;
+      
+      const modalContent = document.createElement('div');
+      modalContent.style.cssText = `
+        background: var(--card-bg, #1e293b);
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      `;
+      
+      const title = document.createElement('h2');
+      title.style.cssText = `
+        color: var(--text-primary, #fff);
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 1rem 0;
+        text-align: center;
+      `;
+      title.textContent = '✅ Player Created!';
+      
+      const message = document.createElement('p');
+      message.style.cssText = `
+        color: var(--text-secondary, #94a3b8);
+        text-align: center;
+        margin: 0 0 1.5rem 0;
+      `;
+      const messageText1 = document.createTextNode('Where would you like to add ');
+      const strongElement = document.createElement('strong');
+      strongElement.textContent = playerName;
+      const messageText2 = document.createTextNode('?');
+      message.appendChild(messageText1);
+      message.appendChild(strongElement);
+      message.appendChild(messageText2);
+      
+      const buttonContainer = document.createElement('div');
+      buttonContainer.style.cssText = 'display: flex; flex-direction: column; gap: 0.75rem;';
+      
+      // Add to Starting 5 button
+      const startersBtn = document.createElement('button');
+      startersBtn.className = 'btn btn-primary';
+      startersBtn.style.cssText = 'width: 100%; padding: 1rem; font-size: 1rem;';
+      startersBtn.textContent = '🏀 Add to Starting 5';
+      startersBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+        addPlayerToStarters(playerId);
+      });
+      
+      // Add to Bench button
+      const benchBtn = document.createElement('button');
+      benchBtn.className = 'btn btn-secondary';
+      benchBtn.style.cssText = 'width: 100%; padding: 1rem; font-size: 1rem;';
+      benchBtn.textContent = '💺 Add to Bench';
+      benchBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+        addPlayerToBench(playerId);
+      });
+      
+      // Skip button
+      const skipBtn = document.createElement('button');
+      skipBtn.className = 'btn btn-outline';
+      skipBtn.style.cssText = 'width: 100%; padding: 0.75rem; font-size: 0.9rem; background: transparent; border: 2px solid var(--text-secondary, #64748b); color: var(--text-secondary, #94a3b8);';
+      skipBtn.textContent = 'Skip (Don\'t Add Yet)';
+      skipBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+        skipAddToRoster();
+      });
+      
+      buttonContainer.appendChild(startersBtn);
+      buttonContainer.appendChild(benchBtn);
+      buttonContainer.appendChild(skipBtn);
+      
+      modalContent.appendChild(title);
+      modalContent.appendChild(message);
+      modalContent.appendChild(buttonContainer);
+      
+      modal.appendChild(modalContent);
+      document.body.appendChild(modal);
+    }
+
+    async function addPlayerToStarters(playerId) {
+      try {
+        showLoading('Adding to Starting 5...');
+        
+        console.log('➕ Adding player to starters:', playerId);
+        
+        // Get team
+        const team = await dbManager.get('teams', teamId);
+        
+        if (!team) {
+          throw new Error('Team not found');
+        }
+        
+        // Initialize roster if needed
+        if (!team.roster) {
+          team.roster = { starters: [], bench: [] };
+        }
+        
+        // Check if already in roster
+        if (team.roster.starters && team.roster.starters.includes(playerId)) {
+          showToast('Player already in Starting 5', 'error');
+          hideLoading();
+          return;
+        }
+        
+        if (team.roster.bench && team.roster.bench.includes(playerId)) {
+          showToast('Player already on Bench', 'error');
+          hideLoading();
+          return;
+        }
+        
+        // Check starters limit
+        if (team.roster.starters && team.roster.starters.length >= 5) {
+          showToast('Starting 5 is full!', 'error');
+          hideLoading();
+          return;
+        }
+        
+        // Add to starters
+        if (!team.roster.starters) {
+          team.roster.starters = [];
+        }
+        team.roster.starters.push(playerId);
+        team.updatedAt = new Date().toISOString();
+        
+        console.log('💾 Saving team with updated roster...');
+        await dbManager.save('teams', teamId, team);
+        
+        // Verify
+        const verifyTeam = await dbManager.get('teams', teamId);
+        console.log('✅ Verified - Starters:', verifyTeam.roster.starters);
+        
+        hideLoading();
+        showToast('Added to Starting 5!', 'success');
+        
+        // Navigate back to roster
+        setTimeout(() => {
+          navigateToPage('roster-view.html', { teamId });
+        }, 1000);
+        
+      } catch (error) {
+        console.error('❌ Error adding to starters:', error);
+        hideLoading();
+        showToast('Failed to add player: ' + error.message, 'error');
+      }
+    }
+
+    async function addPlayerToBench(playerId) {
+      try {
+        showLoading('Adding to Bench...');
+        
+        console.log('➕ Adding player to bench:', playerId);
+        
+        // Get team
+        const team = await dbManager.get('teams', teamId);
+        
+        if (!team) {
+          throw new Error('Team not found');
+        }
+        
+        // Initialize roster if needed
+        if (!team.roster) {
+          team.roster = { starters: [], bench: [] };
+        }
+        
+        // Check if already in roster
+        if (team.roster.starters && team.roster.starters.includes(playerId)) {
+          showToast('Player already in Starting 5', 'error');
+          hideLoading();
+          return;
+        }
+        
+        if (team.roster.bench && team.roster.bench.includes(playerId)) {
+          showToast('Player already on Bench', 'error');
+          hideLoading();
+          return;
+        }
+        
+        // Add to bench
+        if (!team.roster.bench) {
+          team.roster.bench = [];
+        }
+        team.roster.bench.push(playerId);
+        team.updatedAt = new Date().toISOString();
+        
+        console.log('💾 Saving team with updated roster...');
+        await dbManager.save('teams', teamId, team);
+        
+        // Verify
+        const verifyTeam = await dbManager.get('teams', teamId);
+        console.log('✅ Verified - Bench:', verifyTeam.roster.bench);
+        
+        hideLoading();
+        showToast('Added to Bench!', 'success');
+        
+        // Navigate back to roster
+        setTimeout(() => {
+          navigateToPage('roster-view.html', { teamId });
+        }, 1000);
+        
+      } catch (error) {
+        console.error('❌ Error adding to bench:', error);
+        hideLoading();
+        showToast('Failed to add player: ' + error.message, 'error');
+      }
+    }
+
+    function skipAddToRoster() {
+      // Just navigate back to roster without adding
+      navigateToPage('roster-view.html', { teamId });
     }
 
     window.addEventListener('load', async () => {
