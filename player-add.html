@@ -517,54 +517,76 @@
         padding: 1rem;
       `;
       
-      modal.innerHTML = `
-        <div style="
-          background: var(--card-bg, #1e293b);
-          border-radius: 16px;
-          padding: 2rem;
-          max-width: 400px;
-          width: 100%;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        ">
-          <h2 style="
-            color: var(--text-primary, #fff);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0 0 1rem 0;
-            text-align: center;
-          ">✅ Player Created!</h2>
-          
-          <p style="
-            color: var(--text-secondary, #94a3b8);
-            text-align: center;
-            margin: 0 0 1.5rem 0;
-          ">Where would you like to add <strong>${sanitizeHTML(playerName)}</strong>?</p>
-          
-          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <button 
-              class="btn btn-primary" 
-              onclick="addPlayerToStarters('${playerId}')"
-              style="width: 100%; padding: 1rem; font-size: 1rem;">
-              🏀 Add to Starting 5
-            </button>
-            
-            <button 
-              class="btn btn-secondary" 
-              onclick="addPlayerToBench('${playerId}')"
-              style="width: 100%; padding: 1rem; font-size: 1rem;">
-              💺 Add to Bench
-            </button>
-            
-            <button 
-              class="btn btn-outline" 
-              onclick="skipAddToRoster()"
-              style="width: 100%; padding: 0.75rem; font-size: 0.9rem; background: transparent; border: 2px solid var(--text-secondary, #64748b); color: var(--text-secondary, #94a3b8);">
-              Skip (Don't Add Yet)
-            </button>
-          </div>
-        </div>
+      const modalContent = document.createElement('div');
+      modalContent.style.cssText = `
+        background: var(--card-bg, #1e293b);
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
       `;
       
+      const title = document.createElement('h2');
+      title.style.cssText = `
+        color: var(--text-primary, #fff);
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 1rem 0;
+        text-align: center;
+      `;
+      title.textContent = '✅ Player Created!';
+      
+      const message = document.createElement('p');
+      message.style.cssText = `
+        color: var(--text-secondary, #94a3b8);
+        text-align: center;
+        margin: 0 0 1.5rem 0;
+      `;
+      message.innerHTML = `Where would you like to add <strong>${sanitizeHTML(playerName)}</strong>?`;
+      
+      const buttonContainer = document.createElement('div');
+      buttonContainer.style.cssText = 'display: flex; flex-direction: column; gap: 0.75rem;';
+      
+      // Add to Starting 5 button
+      const startersBtn = document.createElement('button');
+      startersBtn.className = 'btn btn-primary';
+      startersBtn.style.cssText = 'width: 100%; padding: 1rem; font-size: 1rem;';
+      startersBtn.textContent = '🏀 Add to Starting 5';
+      startersBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+        addPlayerToStarters(playerId);
+      });
+      
+      // Add to Bench button
+      const benchBtn = document.createElement('button');
+      benchBtn.className = 'btn btn-secondary';
+      benchBtn.style.cssText = 'width: 100%; padding: 1rem; font-size: 1rem;';
+      benchBtn.textContent = '💺 Add to Bench';
+      benchBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+        addPlayerToBench(playerId);
+      });
+      
+      // Skip button
+      const skipBtn = document.createElement('button');
+      skipBtn.className = 'btn btn-outline';
+      skipBtn.style.cssText = 'width: 100%; padding: 0.75rem; font-size: 0.9rem; background: transparent; border: 2px solid var(--text-secondary, #64748b); color: var(--text-secondary, #94a3b8);';
+      skipBtn.textContent = 'Skip (Don\'t Add Yet)';
+      skipBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+        skipAddToRoster();
+      });
+      
+      buttonContainer.appendChild(startersBtn);
+      buttonContainer.appendChild(benchBtn);
+      buttonContainer.appendChild(skipBtn);
+      
+      modalContent.appendChild(title);
+      modalContent.appendChild(message);
+      modalContent.appendChild(buttonContainer);
+      
+      modal.appendChild(modalContent);
       document.body.appendChild(modal);
     }
 
