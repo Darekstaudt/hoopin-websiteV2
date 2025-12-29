@@ -843,33 +843,28 @@
         card.classList.add('swap-source');
       }
       
-      // Card structure matching screenshots - stats on LEFT, photo on RIGHT
+      // Card structure using CORRECT class names from cards.css
       card.innerHTML = `
-        <div class="player-card-header">
-          <div class="player-card-overall">
-            <div class="overall-number">${player.overall}</div>
-            ${player.tier ? `<div class="overall-tier">${player.tier}</div>` : ''}
-          </div>
+        <div class="player-card-overall-badge">
+          <div class="overall-number">${player.overall}</div>
         </div>
-        <div class="player-card-content">
-          <div class="player-card-stats">
-            <div class="stat-line"><strong>Face:</strong> ${player.stats.face || 0}</div>
-            <div class="stat-line"><strong>Eyes:</strong> ${player.stats.eyes || 0}</div>
-            <div class="stat-line"><strong>Top:</strong> ${player.stats.top || 0}</div>
-            <div class="stat-line"><strong>Bottom:</strong> ${player.stats.bottom || 0}</div>
-            <div class="stat-line"><strong>Fitness:</strong> ${player.stats.fitness || 0}</div>
-            <div class="stat-line"><strong>Person:</strong> ${player.stats.personality || 0}</div>
+        <div class="player-card-body">
+          <div class="player-card-stats-side">
+            <div class="stat-line-compact"><strong>Face:</strong> ${player.stats.face || 0}</div>
+            <div class="stat-line-compact"><strong>Eyes:</strong> ${player.stats.eyes || 0}</div>
+            <div class="stat-line-compact"><strong>Top:</strong> ${player.stats.top || 0}</div>
+            <div class="stat-line-compact"><strong>Bottom:</strong> ${player.stats.bottom || 0}</div>
+            <div class="stat-line-compact"><strong>Fitness:</strong> ${player.stats.fitness || 0}</div>
+            <div class="stat-line-compact"><strong>Person:</strong> ${player.stats.personality || 0}</div>
           </div>
-          <div class="player-card-photo">
+          <div class="player-card-photo-side">
             ${player.playerPhoto 
               ? `<img src="${player.playerPhoto}" alt="${player.playerName}" />`
-              : '<div class="player-icon-placeholder">👤</div>'
+              : '<div class="player-icon-large">👤</div>'
             }
           </div>
         </div>
-        <div class="player-card-footer">
-          <div class="player-name">${sanitizeHTML(player.playerName)}</div>
-        </div>
+        <div class="player-card-name-bar">${sanitizeHTML(player.playerName)}</div>
       `;
       
       // Add click handler
