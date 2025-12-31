@@ -867,37 +867,23 @@
       document.getElementById('benchCount').textContent = bench.length;
       
       // Calculate average overall (will need to load players for this)
-      calculateAverageOverall(starters, bench);
+      calculateAverageOverall(starters);
     }
 
-    async function calculateAverageOverall(starterIds, benchIds) {
-      try {
-        const allPlayerIds = [...starterIds, ...benchIds];
-        
-        if (allPlayerIds.length === 0) {
-          document.getElementById('avgOverall').textContent = '0';
-          return;
-        }
-        
-        let totalOverall = 0;
-        let count = 0;
-        
-        for (const playerId of allPlayerIds) {
-          try {
-            const player = await playerManager.getPlayer(playerId);
-            totalOverall += player.overall;
-            count++;
-          } catch (e) {
-            console.error('Error loading player for avg:', playerId);
-          }
-        }
-        
-        const avg = count > 0 ? Math.round(totalOverall / count) : 0;
-        document.getElementById('avgOverall').textContent = avg;
-      } catch (error) {
-        console.error('Error calculating average:', error);
-      }
+    // Only starters, always divides by 5, missing starters count as 0
+async function calculateAverageOverall(starterIds) {
+  let totalOverall = 0;
+  for (const playerId of starterIds) {
+    try {
+      const player = await playerManager.getPlayer(playerId);
+      totalOverall += player && player.overall ? player.overall : 0;
+    } catch (e) {
+      totalOverall += 0;
     }
+  }
+  let avg = Math.round(totalOverall / 5);
+  document.getElementById('avgOverall').textContent = avg;
+}
 
     function goBack() {
       navigateToPage('dashboard.html');
