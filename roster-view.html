@@ -16,93 +16,82 @@
   <style>
 /* Team Info Card */
 .team-info-card {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,0.08);
   border-radius: 16px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.team-info-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
+  align-items: flex-start;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  gap: 1.25rem;
 }
 
 .team-logo {
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
+  width: 85px;
+  height: 85px;
+  border-radius: 14px;
   object-fit: cover;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.28);
+  background:#222;
+  flex-shrink:0;
 }
 
-.team-info-text {
+.team-info-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .team-name-title {
-  font-size: 1.75rem;
+  font-size: 1.4rem;
   font-weight: 800;
-  color: var(--text-primary, #fff);
-  margin: 0 0 0.5rem 0;
+  margin: 0;
+  color: #fff;
 }
 
 .team-manager {
-  font-size: 0.95rem;
-  color: var(--text-muted, #94a3b8);
-}
-
-.team-info-right {
-  display: flex;
-  align-items: center;
+  color: #94a3b8;
+  font-size: 0.93rem;
+  margin-bottom: 0.8em;
 }
 
 .division-badge {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  padding: 0.75rem 1.25rem;
-  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: .65em;
+  margin-top: 0.1em;
+  padding: 0.4em 1.1em;
   font-weight: 700;
-  font-size: 1.25rem;
-  text-align: center;
-  min-width: 80px;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  font-size: 1.1rem;
 }
 
-.team-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
+.team-stats-row {
+  display: flex;
+  gap: 1em;
+  margin-top: 0.35em;
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1rem;
-  border-radius: 12px;
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 0.75em 0.45em;
   text-align: center;
+  min-width: 67px;
 }
-
 .stat-value {
-  font-size: 2rem;
-  font-weight: 900;
-  color: var(--color-primary, #3b82f6);
-  margin-bottom: 0.25rem;
+  font-size: 1.45em;
+  font-weight: bold;
+  color: #3b82f6;
+  margin-bottom: 0.12em;
 }
-
 .stat-label {
-  font-size: 0.875rem;
-  color: var(--text-muted, #94a3b8);
+  font-size: 0.83em;
+  color: #94a3b8;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: .5px;
 }
-
 /* Roster Sections */
 .roster-section {
   margin-bottom: 2rem;
@@ -313,18 +302,32 @@
     <!-- Swap banner will be inserted here -->
     
     <!-- Team Info Card -->
-    <div class="team-info-card" id="teamInfoCard">
-      <div class="team-info-left">
-        <img id="teamLogo" class="team-logo" src="" alt="Team Logo">
-        <div class="team-info-text">
-          <h1 id="teamName" class="team-name-title">Team Roster</h1>
-          <div id="teamManager" class="team-manager">Manager: </div>
-        </div>
+   <div class="team-info-card" id="teamInfoCard">
+  <img id="teamLogo" class="team-logo" src="" alt="Team Logo">
+  <div class="team-info-content">
+    <h1 id="teamName" class="team-name-title">Team Name</h1>
+    <div id="teamManager" class="team-manager">Manager: </div>
+    <div id="teamDivision" class="division-badge"></div>
+    <div class="team-stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="totalPlayers">0</div>
+        <div class="stat-label">Players</div>
       </div>
-      <div class="team-info-right">
-        <div id="teamDivision" class="division-badge"></div>
+      <div class="stat-card">
+        <div class="stat-value" id="avgOverall">0</div>
+        <div class="stat-label">Avg OVR</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="startersCount">0/5</div>
+        <div class="stat-label">Starters</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="benchCount">0</div>
+        <div class="stat-label">Bench</div>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- Stats Cards -->
     <div class="team-stats">
