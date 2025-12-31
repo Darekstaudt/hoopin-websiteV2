@@ -269,62 +269,74 @@
     }
 
     function renderPlayerCard() {
-      const container = document.getElementById('playerCard');
-      const player = currentPlayer;
+  const container = document.getElementById('playerCard');
+  const player = currentPlayer;
 
-      const card = document.createElement('div');
-      card.className = `player-card ${player.tierClass}`;
+  const card = document.createElement('div');
+  card.className = `player-card ${player.tierClass}`;
 
-      card.innerHTML = `
-        ${player.playerPhoto 
-          ? `<img src="${player.playerPhoto}" class="player-photo" alt="${player.playerName}">`
-          : '<div class="player-photo" style="margin: 0 auto; background: var(--secondary-bg); display: flex; align-items: center; justify-content: center; font-size: 4rem;">👤</div>'
+  card.innerHTML = `
+    <div class="player-card-body" style="display: flex; flex-direction: row-reverse; align-items: center;">
+      <div class="player-card-photo-side" style="flex: 0 0 75%; display: flex; justify-content: center; align-items: center;">
+        ${
+          player.playerPhoto
+            ? `<img src="${player.playerPhoto}" class="player-photo" style="width: 84%; aspect-ratio: 1/1; border-radius: 14px; object-fit: cover; background: #181e26;" alt="${player.playerName}">`
+            : '<div class="player-photo player-icon-large" style="width: 84%; aspect-ratio: 1/1; border-radius: 14px; background: #181e26; display: flex; justify-content: center; align-items: center; font-size: 4rem;">👤</div>'
         }
+      </div>
+      <div class="player-card-stats-side" style="flex: 0 0 25%; display: flex; flex-direction: column; font-size: 0.87em; gap: 0.22em; align-items: flex-start; margin-right: 0.8em;">
+        <div class="stat-line-compact"><strong>Face:</strong> ${player.stats.face ?? 0}</div>
+        <div class="stat-line-compact"><strong>Top:</strong> ${player.stats.top ?? 0}</div>
+        <div class="stat-line-compact"><strong>Bottom:</strong> ${player.stats.bottom ?? 0}</div>
+        <div class="stat-line-compact"><strong>Fitness:</strong> ${player.stats.fitness ?? 0}</div>
+        <div class="stat-line-compact"><strong>Personality:</strong> ${player.stats.personality ?? 0}</div>
+      </div>
+    </div>
 
-        <h2 class="text-center" style="margin-top: 1rem;">${sanitizeHTML(player.playerName)}</h2>
+    <h2 class="text-center" style="margin-top: 1rem;">${sanitizeHTML(player.playerName)}</h2>
 
-        <div class="tier-badge tier-${player.tierClass.replace('tier-', '')}" style="background: ${player.gradient}">
-          <div class="tier-overall">${player.overall}</div>
-          <div class="tier-name">${player.tier}</div>
-          <div class="tier-rarity">${player.rarity}</div>
-        </div>
+    <div class="tier-badge tier-${player.tierClass.replace('tier-', '')}" style="background: ${player.gradient}">
+      <div class="tier-overall">${player.overall}</div>
+      <div class="tier-name">${player.tier}</div>
+      <div class="tier-rarity">${player.rarity}</div>
+    </div>
 
-        <div class="player-stats" style="grid-template-columns: repeat(3, 1fr); margin: 2rem 0;">
-          <div class="stat-item">
-            <div class="stat-label">Base Stats</div>
-            <div class="stat-value">${player.baseTotal}</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Cap Breakers</div>
-            <div class="stat-value">${player.capBreakerTotal}</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Overall</div>
-            <div class="stat-value">${player.overall}</div>
-          </div>
-        </div>
+    <div class="player-stats" style="grid-template-columns: repeat(3, 1fr); margin: 2rem 0;">
+      <div class="stat-item">
+        <div class="stat-label">Base Stats</div>
+        <div class="stat-value">${player.baseTotal}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Cap Breakers</div>
+        <div class="stat-value">${player.capBreakerTotal}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Overall</div>
+        <div class="stat-value">${player.overall}</div>
+      </div>
+    </div>
 
-        ${ratingsCalculator.createStatBars(player.stats, player.capBreakers)}
+    ${ratingsCalculator.createStatBars(player.stats, player.capBreakers)}
 
-        <div style="display: flex; gap: 0.5rem; margin-top: 2rem; flex-wrap: wrap;">
-          <button class="btn btn-primary" style="flex: 1; min-width: 120px;" onclick="editPlayer()">
-            ✏️ Edit
-          </button>
-          <button class="btn btn-secondary" onclick="sharePlayer()">
-            📤 Share
-          </button>
-          <button class="btn btn-accent" onclick="initiateSwap()">
-            🔄 Swap
-          </button>
-          <button class="btn btn-danger" onclick="deletePlayer()">
-            🗑️ Delete
-          </button>
-        </div>
-      `;
+    <div style="display: flex; gap: 0.5rem; margin-top: 2rem; flex-wrap: wrap;">
+      <button class="btn btn-primary" style="flex: 1; min-width: 120px;" onclick="editPlayer()">
+        ✏️ Edit
+      </button>
+      <button class="btn btn-secondary" onclick="sharePlayer()">
+        📤 Share
+      </button>
+      <button class="btn btn-accent" onclick="initiateSwap()">
+        🔄 Swap
+      </button>
+      <button class="btn btn-danger" onclick="deletePlayer()">
+        🗑️ Delete
+      </button>
+    </div>
+  `;
 
-      container.innerHTML = '';
-      container.appendChild(card);
-    }
+  container.innerHTML = '';
+  container.appendChild(card);
+}
 
     function editPlayer() {
       if (!currentPlayer) return;
