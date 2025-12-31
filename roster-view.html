@@ -16,81 +16,99 @@
   <style>
 /* Team Info Card */
 .team-info-card {
-  background: rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
   display: flex;
   align-items: flex-start;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  background: rgba(24,29,37,0.92);
+  box-shadow: 0 4px 18px 0 rgba(0,0,0,0.22);
+  border-radius: 16px;
+  padding: 1.3rem 1.1rem 1rem 1.1rem;
   gap: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .team-logo {
-  width: 85px;
-  height: 85px;
-  border-radius: 14px;
+  width: 74px;
+  height: 74px;
   object-fit: cover;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.28);
-  background:#222;
-  flex-shrink:0;
+  border-radius: 13px;
+  box-shadow: 0 4px 13px rgba(0,0,0,0.23);
+  flex-shrink: 0;
 }
 
-.team-info-content {
+.team-info-details {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  justify-content: flex-start;
+  gap: 0.35em;
+}
+
+.team-name-row {
+  display: flex;
+  align-items: center;
+  gap: .7em;
+  margin-bottom: .1em;
 }
 
 .team-name-title {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 800;
-  margin: 0;
   color: #fff;
+  margin: 0;
+  line-height: 1.18;
 }
 
 .team-manager {
   color: #94a3b8;
-  font-size: 0.93rem;
-  margin-bottom: 0.8em;
+  font-size: 0.97rem;
+  margin-bottom: .5em;
+  margin-top: -2px;
 }
 
 .division-badge {
   display: inline-block;
-  margin-bottom: .65em;
-  margin-top: 0.1em;
-  padding: 0.4em 1.1em;
-  font-weight: 700;
-  border-radius: 10px;
-  font-size: 1.1rem;
+  background: #1abc6c;
+  color: #fff;
+  font-weight: bold;
+  padding: .29em 1em;
+  border-radius: 9px;
+  font-size: 1.07rem;
+  box-shadow: 0 2px 8px 0 rgba(16,185,129,0.17);
+  margin: 0;
 }
 
 .team-stats-row {
   display: flex;
+  flex-direction: row;
   gap: 1em;
-  margin-top: 0.35em;
 }
 
 .stat-card {
-  flex: 1;
-  background: rgba(255,255,255,0.06);
+  flex: 1 1 40px;
+  background: rgba(255,255,255,0.055);
+  padding: 0.67em 0.41em;
   border-radius: 10px;
-  padding: 0.75em 0.45em;
   text-align: center;
-  min-width: 67px;
+  min-width: 62px;
 }
 .stat-value {
-  font-size: 1.45em;
-  font-weight: bold;
-  color: #3b82f6;
-  margin-bottom: 0.12em;
+  font-size: 1.25em;
+  font-weight: 800;
+  color: #42b6f6;
+  margin-bottom: 2px;
+  letter-spacing: .01em;
 }
 .stat-label {
-  font-size: 0.83em;
-  color: #94a3b8;
+  font-size: 0.80em;
+  color: #7fa2b8;
   text-transform: uppercase;
-  letter-spacing: .5px;
+  letter-spacing: .45px;
+}
+
+@media (max-width:600px) {
+  .team-info-card { flex-direction: row; }
+  .team-stats-row { gap: 0.35em; }
+  .team-logo { width:48px; height:48px; }
 }
 /* Roster Sections */
 .roster-section {
@@ -303,11 +321,13 @@
     
     <!-- Team Info Card -->
    <div class="team-info-card" id="teamInfoCard">
-  <img id="teamLogo" class="team-logo" src="" alt="Team Logo">
-  <div class="team-info-content">
-    <h1 id="teamName" class="team-name-title">Team Name</h1>
+  <img id="teamLogo" class="team-logo" src="" alt="Team Logo" />
+  <div class="team-info-details">
+    <div class="team-name-row">
+      <h1 id="teamName" class="team-name-title">Team Name</h1>
+      <div id="teamDivision" class="division-badge"></div>
+    </div>
     <div id="teamManager" class="team-manager">Manager: </div>
-    <div id="teamDivision" class="division-badge"></div>
     <div class="team-stats-row">
       <div class="stat-card">
         <div class="stat-value" id="totalPlayers">0</div>
@@ -328,7 +348,6 @@
     </div>
   </div>
 </div>
-
     <!-- Stats Cards -->
     <div class="team-stats">
       <div class="stat-card">
